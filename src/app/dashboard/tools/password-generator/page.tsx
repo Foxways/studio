@@ -20,8 +20,6 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Slider } from '@/components/ui/slider'
 import { PageHeader } from '@/components/page-header'
 import { GlassCard } from '@/components/glass-card'
-import type { GenerateAdvancedPasswordOutput } from '@/ai/flows/advanced-password-generator'
-import { analyzePasswordAction } from '@/lib/actions'
 import { useToast } from '@/hooks/use-toast'
 
 const formSchema = z.object({
@@ -35,7 +33,7 @@ const formSchema = z.object({
 type FormSchema = z.infer<typeof formSchema>;
 
 export default function PasswordGeneratorPage() {
-  const [result, setResult] = useState<GenerateAdvancedPasswordOutput | null>(null)
+  const [result, setResult] = useState<{ password: string } | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [copied, setCopied] = useState(false)
   const { toast } = useToast()
@@ -83,35 +81,22 @@ export default function PasswordGeneratorPage() {
   }
 
   async function onSubmit(values: FormSchema) {
-    setIsLoading(true)
-    setResult(null)
+    setIsLoading(true);
+    setResult(null);
 
+    // Simulate a short delay for better UX
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
     const newPassword = generatePassword(values);
     if (!newPassword) {
         setIsLoading(false);
         return;
     }
     
-    const analysisResponse = await analyzePasswordAction({ password: newPassword });
-
-    if (analysisResponse.success && analysisResponse.data) {
-       setResult({
-        password: newPassword,
-        reasoning: analysisResponse.data.reasoning || 'Could not retrieve AI analysis.'
-      });
-    } else {
-      setResult({
-        password: newPassword,
-        reasoning: 'AI analysis failed, but your password has been generated.'
-      });
-      toast({
-        variant: 'destructive',
-        title: 'Analysis Error',
-        description: analysisResponse.error,
-      })
-    }
-    setIsLoading(false)
+    setResult({ password: newPassword });
+    setIsLoading(false);
   }
+
 
   const handleCopy = () => {
     if (result?.password) {
@@ -235,10 +220,6 @@ export default function PasswordGeneratorPage() {
                             <span className="sr-only">Copy password</span>
                         </Button>
                     </div>
-                     <div className="p-4 bg-black/20 rounded-md">
-                        <h4 className="font-semibold text-white mb-2">AI Analysis</h4>
-                        <p className="text-sm text-muted-foreground">{result.reasoning}</p>
-                     </div>
                 </div>
             )}
             {!isLoading && !result && (
