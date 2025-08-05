@@ -5,6 +5,7 @@ import type { Credential } from './credential-store';
 import { useCredentialStore } from './credential-store';
 import type { Note } from './note-store';
 import { useNoteStore } from './note-store';
+import { credentials as initialCredentials, notes as initialNotes } from '@/lib/data';
 
 export type ItemType = 'credential' | 'note';
 
@@ -59,13 +60,10 @@ export const useShareStore = create<ShareState>()(
         const { sharedItems } = get();
         const items = sharedItems.filter((item) => item.recipientEmail === email && item.status === 'pending');
         
-        const credentials = useCredentialStore.getState().credentials;
-        const notes = useNoteStore.getState().notes;
-
         return items.map(item => {
             const itemData = item.itemType === 'credential' 
-                ? credentials.find(c => c.id === item.itemId)
-                : notes.find(n => n.id === item.itemId);
+                ? initialCredentials.find(c => c.id === item.itemId)
+                : initialNotes.find(n => n.id === item.itemId);
             return { ...item, itemData: itemData || null };
         }).filter(item => item.itemData !== null) as SharedItemWithData[];
       },
@@ -73,13 +71,10 @@ export const useShareStore = create<ShareState>()(
         const { sharedItems } = get();
         const items = sharedItems.filter((item) => item.senderEmail === email);
 
-        const credentials = useCredentialStore.getState().credentials;
-        const notes = useNoteStore.getState().notes;
-
         return items.map(item => {
             const itemData = item.itemType === 'credential' 
-                ? credentials.find(c => c.id === item.itemId)
-                : notes.find(n => n.id === item.itemId);
+                ? initialCredentials.find(c => c.id === item.itemId)
+                : initialNotes.find(n => n.id === item.itemId);
             return { ...item, itemData: itemData || null };
         }).filter(item => item.itemData !== null) as SharedItemWithData[];
       },
