@@ -18,7 +18,7 @@ import { useLicenseStore, type License } from '@/stores/license-store';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { Calendar } from './ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
 type AddLicenseDialogProps = {
@@ -35,31 +35,24 @@ export function AddLicenseDialog({ children, license }: AddLicenseDialogProps) {
   const { toast } = useToast();
   const { addLicense, updateLicense } = useLicenseStore();
 
-  useEffect(() => {
-    if (open && license) {
-      setName(license.name);
-      setProductKey(license.productKey);
-      if (license.purchaseDate) {
-        setPurchaseDate(new Date(license.purchaseDate));
-      } else {
-        setPurchaseDate(undefined);
-      }
-      if (license.expiryDate) {
-        setExpiryDate(new Date(license.expiryDate));
-      } else {
-        setExpiryDate(undefined);
-      }
-    } else if (!open) {
-        resetForm();
-    }
-  }, [license, open]);
-
   const resetForm = () => {
     setName('');
     setProductKey('');
     setPurchaseDate(undefined);
     setExpiryDate(undefined);
   };
+
+  useEffect(() => {
+    if (open && license) {
+      setName(license.name);
+      setProductKey(license.productKey);
+      setPurchaseDate(new Date(license.purchaseDate));
+      setExpiryDate(new Date(license.expiryDate));
+    } else {
+        // When opening for a new license, or when dialog closes, reset.
+        resetForm();
+    }
+  }, [license, open]);
 
   const handleSave = () => {
     if (!name || !productKey || !purchaseDate || !expiryDate) {
@@ -71,7 +64,7 @@ export function AddLicenseDialog({ children, license }: AddLicenseDialogProps) {
       return;
     }
 
-    const newLicense = {
+    const newLicenseData = {
       name,
       productKey,
       purchaseDate: purchaseDate.toISOString(),
@@ -79,14 +72,13 @@ export function AddLicenseDialog({ children, license }: AddLicenseDialogProps) {
     };
 
     if (license) {
-      updateLicense(license.id, newLicense);
+      updateLicense(license.id, newLicenseData);
       toast({ title: 'Success', description: 'License updated.' });
     } else {
-      addLicense(newLicense);
+      addLicense(newLicenseData);
       toast({ title: 'Success', description: 'License saved.' });
     }
-
-    resetForm();
+    
     setOpen(false);
   };
 
