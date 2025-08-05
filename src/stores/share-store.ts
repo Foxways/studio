@@ -53,23 +53,33 @@ export const useShareStore = create<ShareState>()(
             });
         });
         
-        set((state) => ({ sharedItems: [...newItems, ...state.sharedItems] }));
+        set((state) => ({ sharedItems: [...state.sharedItems, ...newItems] }));
       },
       getInbox: (email) => {
-        const items = get().sharedItems.filter((item) => item.recipientEmail === email && item.status === 'pending');
+        const { sharedItems } = get();
+        const items = sharedItems.filter((item) => item.recipientEmail === email && item.status === 'pending');
+        
+        const credentials = useCredentialStore.getState().credentials;
+        const notes = useNoteStore.getState().notes;
+
         return items.map(item => {
             const itemData = item.itemType === 'credential' 
-                ? useCredentialStore.getState().findCredential(item.itemId)
-                : useNoteStore.getState().findNote(item.itemId);
+                ? credentials.find(c => c.id === item.itemId)
+                : notes.find(n => n.id === item.itemId);
             return { ...item, itemData: itemData || null };
         }).filter(item => item.itemData !== null) as SharedItemWithData[];
       },
       getOutbox: (email) => {
-        const items = get().sharedItems.filter((item) => item.senderEmail === email);
+        const { sharedItems } = get();
+        const items = sharedItems.filter((item) => item.senderEmail === email);
+
+        const credentials = useCredentialStore.getState().credentials;
+        const notes = useNoteStore.getState().notes;
+
         return items.map(item => {
             const itemData = item.itemType === 'credential' 
-                ? useCredentialStore.getState().findCredential(item.itemId)
-                : useNoteStore.getState().findNote(item.itemId);
+                ? credentials.find(c => c.id === item.itemId)
+                : notes.find(n => n.id === item.itemId);
             return { ...item, itemData: itemData || null };
         }).filter(item => item.itemData !== null) as SharedItemWithData[];
       },

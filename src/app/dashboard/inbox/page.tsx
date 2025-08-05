@@ -28,7 +28,7 @@ import {
 import { PageHeader } from "@/components/page-header"
 import { GlassCard } from "@/components/glass-card"
 import { useToast } from "@/hooks/use-toast";
-import { useShareStore, type SharedItem } from "@/stores/share-store";
+import { useShareStore, type SharedItemWithData } from "@/stores/share-store";
 import { useAuthStore } from "@/stores/auth-store";
 import { useCredentialStore } from "@/stores/credential-store";
 import { useNoteStore } from "@/stores/note-store";
@@ -43,15 +43,21 @@ export default function InboxPage() {
 
   const inboxItems = user ? getInbox(user.email) : [];
 
-  const handleAccept = (share: SharedItem) => {
+  const handleAccept = (share: SharedItemWithData) => {
     const item = acceptShare(share.id);
     if (item && share.itemData) {
         if (item.itemType === 'credential') {
-            addCredential(share.itemData);
+            // The itemData from the store is not a full credential, it's a plain object
+            // We need to cast it and remove the fields that are not in the Omit<> type
+            const { id, lastModified, ...credData } = share.itemData;
+            addCredential(credData);
         } else {
-            addNote(share.itemData);
+            const { id, lastModified, ...noteData } = share.itemData;
+            addNote(noteData);
         }
         toast({ title: 'Success', description: `Item has been added to your vault.` });
+    } else {
+         toast({ title: 'Error', variant: 'destructive', description: `Could not accept item.` });
     }
   };
   

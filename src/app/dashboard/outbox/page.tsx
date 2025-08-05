@@ -82,7 +82,7 @@ export default function OutboxPage() {
                         <AlertDialogHeader>
                           <AlertDialogTitle>Are you sure you want to revoke?</AlertDialogTitle>
                           <AlertDialogDescription>
-                            This will remove the item from the recipient's inbox and they will no longer have access to it.
+                            This will remove the item from the recipient's inbox and they will no longer have access to it. This action cannot be undone.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
