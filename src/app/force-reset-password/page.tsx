@@ -3,7 +3,7 @@
 
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
-import { Lock } from 'lucide-react';
+import { Lock, Eye, EyeOff } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -38,6 +38,8 @@ export default function ForceResetPasswordPage() {
   const { user } = useAuthStore();
   const { resetPassword } = useUserStore();
   const { toast } = useToast();
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -88,7 +90,17 @@ export default function ForceResetPasswordPage() {
                     <FormControl>
                     <div className="relative">
                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                       <Input type="password" {...field} className="pl-10" />
+                       <Input type={showNewPassword ? 'text' : 'password'} {...field} className="pl-10 pr-10" />
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+                            onClick={() => setShowNewPassword(!showNewPassword)}
+                          >
+                            {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            <span className="sr-only">{showNewPassword ? 'Hide password' : 'Show password'}</span>
+                          </Button>
                     </div>
                     </FormControl>
                     <FormMessage />
@@ -104,7 +116,17 @@ export default function ForceResetPasswordPage() {
                     <FormControl>
                     <div className="relative">
                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                       <Input type="password" {...field} className="pl-10" />
+                       <Input type={showConfirmPassword ? 'text' : 'password'} {...field} className="pl-10 pr-10" />
+                       <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          >
+                            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            <span className="sr-only">{showConfirmPassword ? 'Hide password' : 'Show password'}</span>
+                          </Button>
                     </div>
                     </FormControl>
                     <FormMessage />

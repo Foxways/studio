@@ -20,6 +20,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
+import { Eye, EyeOff } from 'lucide-react'
 
 const passwordFormSchema = z
   .object({
@@ -36,6 +37,10 @@ export default function ProfilePage() {
   const { user, changePassword } = useAuthStore()
   const [name, setName] = useState('');
   const { toast } = useToast()
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
 
   useEffect(() => {
     if (user) {
@@ -118,7 +123,19 @@ export default function ProfilePage() {
                     <FormItem>
                         <FormLabel>Current Password</FormLabel>
                         <FormControl>
-                        <Input type="password" {...field} />
+                          <div className="relative">
+                            <Input type={showCurrentPassword ? 'text' : 'password'} {...field} className="pr-10" />
+                             <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+                                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                              >
+                                {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                <span className="sr-only">{showCurrentPassword ? 'Hide password' : 'Show password'}</span>
+                              </Button>
+                          </div>
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -131,7 +148,19 @@ export default function ProfilePage() {
                     <FormItem>
                         <FormLabel>New Password</FormLabel>
                         <FormControl>
-                        <Input type="password" {...field} />
+                           <div className="relative">
+                            <Input type={showNewPassword ? 'text' : 'password'} {...field} className="pr-10" />
+                             <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+                                onClick={() => setShowNewPassword(!showNewPassword)}
+                              >
+                                {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                <span className="sr-only">{showNewPassword ? 'Hide password' : 'Show password'}</span>
+                              </Button>
+                          </div>
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -144,7 +173,19 @@ export default function ProfilePage() {
                     <FormItem>
                         <FormLabel>Confirm New Password</FormLabel>
                         <FormControl>
-                        <Input type="password" {...field} />
+                          <div className="relative">
+                            <Input type={showConfirmPassword ? 'text' : 'password'} {...field} className="pr-10" />
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                              >
+                                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                <span className="sr-only">{showConfirmPassword ? 'Hide password' : 'Show password'}</span>
+                              </Button>
+                          </div>
                         </FormControl>
                         <FormMessage />
                     </FormItem>

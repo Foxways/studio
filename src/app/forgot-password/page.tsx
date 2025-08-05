@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
-import { Mail, Lock, HelpCircle } from 'lucide-react';
+import { Mail, Lock, HelpCircle, Eye, EyeOff } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,6 +24,8 @@ export default function ForgotPasswordPage() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [step, setStep] = useState(1); // 1 for email, 2 for security question, 3 for new password
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,25 +160,45 @@ export default function ForgotPasswordPage() {
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                     id="new-password"
-                    type="password"
+                    type={showNewPassword ? 'text' : 'password'}
                     placeholder="New Password"
                     required
-                    className="pl-10"
+                    className="pl-10 pr-10"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                 />
+                 <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                  >
+                    {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    <span className="sr-only">{showNewPassword ? 'Hide password' : 'Show password'}</span>
+                  </Button>
                 </div>
                 <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                     id="confirm-password"
-                    type="password"
+                    type={showConfirmPassword ? 'text' : 'password'}
                     placeholder="Confirm New Password"
                     required
-                    className="pl-10"
+                    className="pl-10 pr-10"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                 />
+                 <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    <span className="sr-only">{showConfirmPassword ? 'Hide password' : 'Show password'}</span>
+                  </Button>
                 </div>
             </div>
             <Button type="submit" className="w-full font-semibold">
