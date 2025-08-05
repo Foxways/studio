@@ -26,6 +26,8 @@ import { Badge } from './ui/badge';
 import { Textarea } from './ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useCredentialStore, type Credential } from '@/stores/credential-store';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { PasswordGeneratorForm } from './password-generator-form';
 
 const TAG_OPTIONS = ['work', 'personal', 'social', 'finance', 'development'];
 
@@ -49,7 +51,6 @@ export function AddCredentialDialog({ children, credential }: AddCredentialDialo
   const [tags, setTags] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
   const [customFields, setCustomFields] = useState<CustomField[]>([]);
-  const [isGenerating, setIsGenerating] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
   const { addCredential, updateCredential } = useCredentialStore();
@@ -100,32 +101,11 @@ export function AddCredentialDialog({ children, credential }: AddCredentialDialo
   const handleTagRemove = (tag: string) => {
     setTags(tags.filter((t) => t !== tag));
   };
-  
-  const generatePassword = () => {
-    const charSets = {
-        lowercase: 'abcdefghijklmnopqrstuvwxyz',
-        uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-        numbers: '0123456789',
-        symbols: '!@#$%^&*()_+-=[]{}|;:,.<>?'
-    };
-    const availableChars = charSets.lowercase + charSets.uppercase + charSets.numbers + charSets.symbols;
-    let newPassword = '';
-    for (let i = 0; i < 16; i++) {
-        const randomIndex = Math.floor(Math.random() * availableChars.length);
-        newPassword += availableChars[randomIndex];
-    }
-    return newPassword;
-  }
 
-  const handleGeneratePassword = async () => {
-    setIsGenerating(true);
-    // Simulate a short delay for better UX
-    await new Promise(resolve => setTimeout(resolve, 300));
-    const newPassword = generatePassword();
+  const handleUsePassword = (newPassword: string) => {
     setPassword(newPassword);
-    toast({ title: 'Success', description: 'New password generated.' });
-    setIsGenerating(false);
-  };
+    toast({ title: 'Success', description: 'Password has been set.'});
+  }
 
   const resetForm = () => {
     setTitle('');
@@ -217,10 +197,17 @@ export function AddCredentialDialog({ children, credential }: AddCredentialDialo
                     <span className="sr-only">{showPassword ? 'Hide password' : 'Show password'}</span>
                   </Button>
               </div>
-              <Button variant="secondary" onClick={handleGeneratePassword} disabled={isGenerating}>
-                {isGenerating ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                <span className='hidden sm:inline ml-2'>Generate</span>
-              </Button>
+               <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="secondary">
+                    <Sparkles className="h-4 w-4" />
+                    <span className='hidden sm:inline ml-2'>Generate</span>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full max-w-md">
+                    <PasswordGeneratorForm onPasswordGenerated={handleUsePassword} />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
          
@@ -293,11 +280,11 @@ export function AddCredentialDialog({ children, credential }: AddCredentialDialo
             ))}
           </div>
         </div>
-        <DialogFooter>
-          <Button type="button" variant="secondary" onClick={() => handleOpenChange(false)}>
+        <DialogFooter className="flex-col sm:flex-row gap-2">
+          <Button type="button" variant="secondary" onClick={() => handleOpenChange(false)} className="w-full sm:w-auto">
             Cancel
           </Button>
-          <Button type="submit" onClick={handleSave}>
+          <Button type="submit" onClick={handleSave} className="w-full sm:w-auto">
             Save Credential
           </Button>
         </DialogFooter>
