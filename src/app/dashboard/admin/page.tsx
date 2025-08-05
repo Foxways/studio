@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation";
 import { Users, KeyRound, ShieldAlert, MoreVertical, Trash2 } from "lucide-react"
 import {
@@ -26,10 +27,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import {
   Table,
   TableBody,
@@ -48,11 +51,16 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
+type ActionType = 'reset' | 'delete' | null;
+
 export default function AdminDashboard() {
   const router = useRouter();
   const { user } = useAuthStore();
   const { users, toggleUserStatus, deleteUser, resetPassword } = useUserStore();
   const { toast } = useToast();
+  const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const [actionType, setActionType] = useState<ActionType>(null);
+
 
   useEffect(() => {
     if (user?.role !== 'Admin') {
@@ -76,22 +84,59 @@ export default function AdminDashboard() {
     });
   };
 
-  const handleResetPassword = (userId: string) => {
-    resetPassword(userId);
-    toast({
-      title: 'Success',
-      description: `Password has been reset to "password123".`,
-    });
+  const handleActionConfirm = () => {
+    if (!selectedUser || !actionType) return;
+    if (actionType === 'reset') {
+      resetPassword(selectedUser);
+      toast({
+        title: 'Success',
+        description: `Password has been reset to "password123".`,
+      });
+    } else if (actionType === 'delete') {
+      deleteUser(selectedUser);
+      toast({
+        variant: 'destructive',
+        title: 'Success',
+        description: 'User has been permanently deleted.',
+      });
+    }
+    setSelectedUser(null);
+    setActionType(null);
+  };
+  
+  const openDialog = (userId: string, type: ActionType) => {
+    setSelectedUser(userId);
+    setActionType(type);
   };
 
-  const handleDeleteUser = (userId: string) => {
-    deleteUser(userId);
-    toast({
-      variant: 'destructive',
-      title: 'Success',
-      description: 'User has been permanently deleted.',
-    });
+  const getDialogContent = () => {
+    if (!actionType) return null;
+    
+    const isReset = actionType === 'reset';
+    return (
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                    {isReset
+                        ? "This will reset the user's password to a default value. This action cannot be undone."
+                        : "This will permanently delete the user's account. This action cannot be undone."
+                    }
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setActionType(null)}>Cancel</AlertDialogCancel>
+                <AlertDialogAction 
+                    onClick={handleActionConfirm}
+                    className={cn(!isReset && buttonVariants({ variant: "destructive" }))}
+                >
+                  {isReset ? "Reset Password" : "Delete User"}
+                </AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    );
   };
+
 
   return (
     <>
@@ -161,86 +206,72 @@ export default function AdminDashboard() {
 
         <GlassCard className="lg:col-span-2">
             <h3 className="text-lg font-medium mb-4">User Management</h3>
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>User</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {users.map((u) => (
-                    <TableRow key={u.id}>
-                        <TableCell>
-                            <div className="font-medium">{u.name}</div>
-                            <div className="text-sm text-muted-foreground">{u.email}</div>
-                        </TableCell>
-                        <TableCell>
-                           <div className="flex items-center gap-2">
-                            <Switch
-                                checked={u.active}
-                                onCheckedChange={() => handleStatusChange(u.id, !u.active)}
-                                disabled={u.email === user?.email}
-                                aria-label={`Toggle status for ${u.name}`}
-                            />
-                            <span className={cn("text-xs", u.active ? "text-green-400" : "text-red-400")}>
-                                {u.active ? 'Active' : 'Inactive'}
-                            </span>
-                           </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                            <AlertDialog>
-                                <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button
-                                    aria-haspopup="true"
-                                    size="icon"
-                                    variant="ghost"
+             <AlertDialog open={!!actionType} onOpenChange={(open) => !open && setActionType(null)}>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>User</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {users.map((u) => (
+                        <TableRow key={u.id}>
+                            <TableCell>
+                                <div className="font-medium">{u.name}</div>
+                                <div className="text-sm text-muted-foreground">{u.email}</div>
+                            </TableCell>
+                            <TableCell>
+                               <div className="flex items-center gap-2">
+                                <Switch
+                                    checked={u.active}
+                                    onCheckedChange={() => handleStatusChange(u.id, !u.active)}
                                     disabled={u.email === user?.email}
-                                    >
-                                    <MoreVertical className="h-4 w-4" />
-                                    <span className="sr-only">Toggle menu</span>
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                    <AlertDialogTrigger asChild>
-                                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                            <KeyRound className="mr-2 h-4 w-4" />
-                                            Reset Password
-                                        </DropdownMenuItem>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogTrigger asChild>
-                                        <DropdownMenuItem className="text-red-500" onSelect={(e) => e.preventDefault()}>
-                                            <Trash2 className="mr-2 h-4 w-4" />
-                                            Delete User
-                                        </DropdownMenuItem>
-                                    </AlertDialogTrigger>
-                                </DropdownMenuContent>
-                                </DropdownMenu>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            This will reset the user's password to a default value or permanently delete them. This action cannot be undone.
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction onClick={() => handleResetPassword(u.id)}>
-                                            Reset Password
-                                        </AlertDialogAction>
-                                         <AlertDialogAction onClick={() => handleDeleteUser(u.id)} className={buttonVariants({ variant: "destructive" })}>
-                                            Delete User
-                                        </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
-                        </TableCell>
-                    </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+                                    aria-label={`Toggle status for ${u.name}`}
+                                />
+                                <span className={cn("text-xs", u.active ? "text-green-400" : "text-red-400")}>
+                                    {u.active ? 'Active' : 'Inactive'}
+                                </span>
+                               </div>
+                            </TableCell>
+                            <TableCell className="text-right">
+                                    <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button
+                                        aria-haspopup="true"
+                                        size="icon"
+                                        variant="ghost"
+                                        disabled={u.email === user?.email}
+                                        >
+                                        <MoreVertical className="h-4 w-4" />
+                                        <span className="sr-only">Toggle menu</span>
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                        <DropdownMenuSeparator />
+                                        <AlertDialogTrigger asChild>
+                                            <DropdownMenuItem onSelect={() => openDialog(u.id, 'reset')}>
+                                                <KeyRound className="mr-2 h-4 w-4" />
+                                                Reset Password
+                                            </DropdownMenuItem>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogTrigger asChild>
+                                            <DropdownMenuItem className="text-red-500" onSelect={() => openDialog(u.id, 'delete')}>
+                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                Delete User
+                                            </DropdownMenuItem>
+                                        </AlertDialogTrigger>
+                                    </DropdownMenuContent>
+                                    </DropdownMenu>
+                            </TableCell>
+                        </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+                {getDialogContent()}
+            </AlertDialog>
         </GlassCard>
       </div>
     </>
