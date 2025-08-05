@@ -1,7 +1,8 @@
+
 'use client';
 
-import { useState } from 'react';
-import { Send } from 'lucide-react';
+import { useState, KeyboardEvent } from 'react';
+import { Send, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -20,6 +21,8 @@ import { useAuthStore } from '@/stores/auth-store';
 import { useUserStore } from '@/stores/user-store';
 import { useCredentialStore } from '@/stores/credential-store';
 import { useNoteStore } from '@/stores/note-store';
+import { Badge } from './ui/badge';
+import { cn } from '@/lib/utils';
 
 type ShareDialogProps = {
   children: React.ReactNode;
@@ -30,7 +33,8 @@ type ShareDialogProps = {
 
 export function ShareDialog({ children, itemIds, itemType, disabled = false }: ShareDialogProps) {
   const [open, setOpen] = useState(false);
-  const [email, setEmail] = useState('');
+  const [recipients, setRecipients] = useState<string[]>([]);
+  const [currentEmail, setCurrentEmail] = useState('');
   const { toast } = useToast();
   const { user: currentUser } = useAuthStore();
   const { users } = useUserStore();
@@ -38,45 +42,69 @@ export function ShareDialog({ children, itemIds, itemType, disabled = false }: S
   const { findCredential } = useCredentialStore();
   const { findNote } = useNoteStore();
 
+  const handleEmailInput = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (['Enter', ' ', ','].includes(e.key) && currentEmail) {
+      e.preventDefault();
+      const newEmail = currentEmail.trim().toLowerCase();
+      if (newEmail && !recipients.includes(newEmail)) {
+        setRecipients([...recipients, newEmail]);
+      }
+      setCurrentEmail('');
+    }
+  };
+  
+  const handleRemoveRecipient = (emailToRemove: string) => {
+    setRecipients(recipients.filter(email => email !== emailToRemove));
+  }
+
   const handleShare = () => {
-    if (!email) {
-      toast({ variant: 'destructive', title: 'Error', description: 'Please enter an email address.' });
-      return;
-    }
-    const recipient = users.find((u) => u.email === email);
-    if (!recipient) {
-      toast({ variant: 'destructive', title: 'Error', description: 'User not found.' });
-      return;
-    }
-    if (recipient.email === currentUser?.email) {
-      toast({ variant: 'destructive', title: 'Error', description: 'You cannot share items with yourself.' });
+    if (recipients.length === 0) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Please enter at least one recipient email address.' });
       return;
     }
 
-    let sharedCount = 0;
-    itemIds.forEach((id) => {
-      const itemData = itemType === 'credential' ? findCredential(id) : findNote(id);
-      if (itemData && currentUser) {
-        shareItem(currentUser.email, recipient.email, itemData);
-        sharedCount++;
-      }
+    let totalSharedCount = 0;
+
+    recipients.forEach(email => {
+        const recipient = users.find((u) => u.email === email);
+        if (!recipient) {
+          toast({ variant: 'destructive', title: 'User not found', description: `User with email ${email} does not exist.` });
+          return;
+        }
+        if (recipient.email === currentUser?.email) {
+          toast({ variant: 'destructive', title: 'Cannot share with yourself', description: 'You cannot share items with your own account.' });
+          return;
+        }
+
+        let sharedCount = 0;
+        itemIds.forEach((id) => {
+        const itemData = itemType === 'credential' ? findCredential(id) : findNote(id);
+        if (itemData && currentUser) {
+            shareItem(currentUser.email, recipient.email, itemData);
+            sharedCount++;
+        }
+        });
+
+        if (sharedCount > 0) {
+            totalSharedCount += sharedCount
+            toast({
+                title: 'Success',
+                description: `${itemIds.length} item(s) shared successfully with ${email}.`,
+            });
+        }
     });
 
-    if (sharedCount > 0) {
-      toast({
-        title: 'Success',
-        description: `${sharedCount} item(s) shared successfully with ${email}.`,
-      });
-    }
 
-    setOpen(false);
-    setEmail('');
+    if(totalSharedCount > 0) {
+        setOpen(false);
+    }
   };
 
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen);
     if (!isOpen) {
-      setEmail('');
+      setCurrentEmail('');
+      setRecipients([]);
     }
   };
 
@@ -87,19 +115,31 @@ export function ShareDialog({ children, itemIds, itemType, disabled = false }: S
         <DialogHeader>
           <DialogTitle>Share Item(s)</DialogTitle>
           <DialogDescription>
-            Enter the email address of the user you want to share with. They must have an account.
+            Enter email addresses of users you want to share with. Press space or enter to add an email.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Recipient's Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="user@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+            <Label htmlFor="email">Recipient's Email(s)</Label>
+            <div className={cn("flex flex-wrap items-center gap-2 rounded-md border border-input p-2", recipients.length > 0 && "py-2 px-2")}>
+                {recipients.map(email => (
+                    <Badge key={email} variant="secondary">
+                        {email}
+                        <button onClick={() => handleRemoveRecipient(email)} className="ml-1 rounded-full p-0.5 hover:bg-black/20">
+                            <X className="h-3 w-3" />
+                        </button>
+                    </Badge>
+                ))}
+                <Input
+                    id="email"
+                    type="email"
+                    placeholder="user@example.com"
+                    value={currentEmail}
+                    onChange={(e) => setCurrentEmail(e.target.value)}
+                    onKeyDown={handleEmailInput}
+                    className="flex-1 border-none focus-visible:ring-0 focus-visible:ring-offset-0 p-0 h-auto"
+                />
+            </div>
           </div>
         </div>
         <DialogFooter>
