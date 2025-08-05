@@ -279,7 +279,10 @@ export default function Dashboard() {
                           </DropdownMenuItem>
                         </AddCredentialDialog>
                          <ShareDialog itemIds={[cred.id]} itemType='credential'>
-                            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>Share</DropdownMenuItem>
+                            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                <Share2 className="mr-2 h-4 w-4" />
+                                Share
+                            </DropdownMenuItem>
                          </ShareDialog>
                           <AlertDialogTrigger asChild>
                             <DropdownMenuItem
