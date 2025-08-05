@@ -47,12 +47,10 @@ export default function InboxPage() {
     const item = acceptShare(share.id);
     if (item && share.itemData) {
         if (item.itemType === 'credential') {
-            // The itemData from the store is not a full credential, it's a plain object
-            // We need to cast it and remove the fields that are not in the Omit<> type
-            const { id, lastModified, ...credData } = share.itemData;
+            const { id, lastModified, ...credData } = share.itemData as any;
             addCredential(credData);
         } else {
-            const { id, lastModified, ...noteData } = share.itemData;
+            const { id, lastModified, ...noteData } = share.itemData as any;
             addNote(noteData);
         }
         toast({ title: 'Success', description: `Item has been added to your vault.` });
