@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { MoreHorizontal, Share2, Trash2, Filter, Search } from 'lucide-react';
+import { MoreHorizontal, Trash2, Filter, Search } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,6 +42,7 @@ import { useCredentialStore } from '@/stores/credential-store';
 import { useSearchStore } from '@/stores/search-store';
 import { useToast } from '@/hooks/use-toast';
 import { formatDistanceToNow } from 'date-fns';
+import { ShareDialog } from '@/components/share-dialog';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -163,9 +164,11 @@ export default function Dashboard() {
             </DropdownMenuContent>
           </DropdownMenu>
           <div className="flex gap-2">
-            <Button variant="outline" disabled={selected.length === 0} className="flex-1">
-              <Share2 className="mr-2 h-4 w-4" /> Share
-            </Button>
+             <ShareDialog itemIds={selected} itemType="credential" disabled={selected.length === 0}>
+                <Button variant="outline" disabled={selected.length === 0} className="flex-1">
+                   Share
+                </Button>
+            </ShareDialog>
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="destructive" disabled={selected.length === 0} className="flex-1">
@@ -274,7 +277,9 @@ export default function Dashboard() {
                             Edit
                           </DropdownMenuItem>
                         </AddCredentialDialog>
-                        <DropdownMenuItem>Share</DropdownMenuItem>
+                         <ShareDialog itemIds={[cred.id]} itemType='credential'>
+                            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>Share</DropdownMenuItem>
+                         </ShareDialog>
                           <AlertDialogTrigger asChild>
                             <DropdownMenuItem
                               className="text-red-500"

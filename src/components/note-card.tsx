@@ -26,6 +26,7 @@ import { useNoteStore, type Note } from '@/stores/note-store';
 import { AddNoteDialog } from './add-note-dialog';
 import { ViewNoteDialog } from './view-note-dialog';
 import { formatDistanceToNow } from 'date-fns';
+import { ShareDialog } from './share-dialog';
 
 export function NoteCard({ note }: { note: Note }) {
   const { deleteNote } = useNoteStore();
@@ -64,7 +65,9 @@ export function NoteCard({ note }: { note: Note }) {
                         Edit
                     </DropdownMenuItem>
                     </AddNoteDialog>
-                    <DropdownMenuItem>Share</DropdownMenuItem>
+                    <ShareDialog itemIds={[note.id]} itemType='note'>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>Share</DropdownMenuItem>
+                    </ShareDialog>
                       <AlertDialogTrigger asChild>
                           <DropdownMenuItem className="text-red-500" onSelect={(e) => e.preventDefault()}>Delete</DropdownMenuItem>
                       </AlertDialogTrigger>

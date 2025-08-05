@@ -11,6 +11,8 @@ import {
   Settings,
   UserCog,
   Bot,
+  Inbox,
+  Send,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
@@ -26,6 +28,8 @@ const mainNavLinks = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/dashboard/notes", label: "Notes", icon: StickyNote },
   { href: "/dashboard/licenses", label: "Licenses", icon: KeyRound },
+  { href: "/dashboard/inbox", label: "Inbox", icon: Inbox },
+  { href: "/dashboard/outbox", label: "Outbox", icon: Send },
 ]
 
 const toolLinks = [
