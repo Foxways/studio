@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Check, Mail, X } from "lucide-react"
@@ -74,9 +75,7 @@ export default function InboxPage() {
               <TableHead>Item</TableHead>
               <TableHead className="hidden md:table-cell">Type</TableHead>
               <TableHead className="hidden lg:table-cell">Received</TableHead>
-              <TableHead>
-                <span className="sr-only">Actions</span>
-              </TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -89,11 +88,11 @@ export default function InboxPage() {
                 </TableCell>
                 <TableCell className="text-muted-foreground hidden lg:table-cell">{formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}</TableCell>
                 <TableCell className="text-right">
+                   <Button variant="ghost" size="icon" onClick={() => handleAccept(item.id)}>
+                    <Check className="h-4 w-4 text-green-400"/>
+                    <span className="sr-only">Accept</span>
+                   </Button>
                    <AlertDialog>
-                      <Button variant="ghost" size="icon" onClick={() => handleAccept(item.id)}>
-                        <Check className="h-4 w-4 text-green-400"/>
-                        <span className="sr-only">Accept</span>
-                      </Button>
                       <AlertDialogTrigger asChild>
                          <Button variant="ghost" size="icon">
                             <X className="h-4 w-4 text-red-400"/>

@@ -1,7 +1,8 @@
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { MoreHorizontal, Trash2, Filter, Search } from 'lucide-react';
+import { MoreHorizontal, Trash2, Filter, Search, Share2 } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -166,7 +167,7 @@ export default function Dashboard() {
           <div className="flex gap-2">
              <ShareDialog itemIds={selected} itemType="credential" disabled={selected.length === 0}>
                 <Button variant="outline" disabled={selected.length === 0} className="flex-1">
-                   Share
+                   <Share2 className="mr-2 h-4 w-4" /> Share
                 </Button>
             </ShareDialog>
             <AlertDialog>

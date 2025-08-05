@@ -1,16 +1,15 @@
+
 import { create } from 'zustand';
 import type { Credential } from './credential-store';
 import type { Note } from './note-store';
 
 export type ItemType = 'credential' | 'note';
-type SharedItemData = Omit<Credential, 'id' | 'lastModified'> | Omit<Note, 'id' | 'lastModified'>;
-
 
 export type SharedItem = {
   id: string;
   senderEmail: string;
   recipientEmail: string;
-  itemData: any; 
+  itemData: Credential | Note; 
   itemType: ItemType;
   status: 'pending' | 'accepted';
   createdAt: string; 
@@ -18,7 +17,7 @@ export type SharedItem = {
 
 type ShareState = {
   sharedItems: SharedItem[];
-  shareItem: (senderEmail: string, recipientEmail: string, itemData: any) => void;
+  shareItem: (senderEmail: string, recipientEmail: string, itemData: Credential | Note) => void;
   getInbox: (email: string) => SharedItem[];
   getOutbox: (email: string) => SharedItem[];
   deleteShare: (id: string) => void;
@@ -28,13 +27,15 @@ type ShareState = {
 export const useShareStore = create<ShareState>((set, get) => ({
   sharedItems: [],
   shareItem: (senderEmail, recipientEmail, itemData) => {
-    const { itemType, ...rest } = itemData;
+    // Correctly determine itemType by checking for a unique property
+    const itemType = 'username' in itemData ? 'credential' : 'note';
+
     const newItem: SharedItem = {
       id: Date.now().toString(),
       senderEmail,
       recipientEmail,
-      itemData: rest,
-      itemType: itemData.hasOwnProperty('username') ? 'credential' : 'note',
+      itemData,
+      itemType: itemType,
       status: 'pending',
       createdAt: new Date().toISOString(),
     };

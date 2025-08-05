@@ -1,6 +1,7 @@
+
 'use client';
 
-import { MoreHorizontal, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Share2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -61,12 +62,15 @@ export function NoteCard({ note }: { note: Note }) {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
                     <AddNoteDialog note={note}>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                        Edit
-                    </DropdownMenuItem>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                          Edit
+                      </DropdownMenuItem>
                     </AddNoteDialog>
                     <ShareDialog itemIds={[note.id]} itemType='note'>
-                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>Share</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                          <Share2 className="mr-2 h-4 w-4" />
+                          Share
+                        </DropdownMenuItem>
                     </ShareDialog>
                       <AlertDialogTrigger asChild>
                           <DropdownMenuItem className="text-red-500" onSelect={(e) => e.preventDefault()}>Delete</DropdownMenuItem>
@@ -91,8 +95,8 @@ export function NoteCard({ note }: { note: Note }) {
         </div>
         <h3 className="text-lg font-semibold text-white mb-2">{note.title}</h3>
         <p className="text-sm text-muted-foreground flex-grow">{excerpt}</p>
-        <p className="text-xs text-muted-foreground mt-4 pt-4 border-t">
-            {formatDistanceToNow(new Date(note.lastModified), { addSuffix: true })}
+        <p className="text-xs text-muted-foreground mt-4 pt-4 border-t border-white/10">
+            Last updated: {formatDistanceToNow(new Date(note.lastModified), { addSuffix: true })}
         </p>
         </GlassCard>
     </ViewNoteDialog>
