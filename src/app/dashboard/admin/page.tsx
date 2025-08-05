@@ -90,7 +90,7 @@ export default function AdminDashboard() {
       resetPassword(selectedUser);
       toast({
         title: 'Success',
-        description: `Password has been reset to "password123".`,
+        description: `Password has been reset. The user will be required to set a new password on their next login.`,
       });
     } else if (actionType === 'delete') {
       deleteUser(selectedUser);
@@ -119,7 +119,7 @@ export default function AdminDashboard() {
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                 <AlertDialogDescription>
                     {isReset
-                        ? "This will reset the user's password to a default value. This action cannot be undone."
+                        ? "This will reset the user's password and require them to create a new one on their next login. This action cannot be undone."
                         : "This will permanently delete the user's account. This action cannot be undone."
                     }
                 </AlertDialogDescription>
