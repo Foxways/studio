@@ -2,7 +2,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Copy, Sparkles } from 'lucide-react'
+import { Copy } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/page-header'
@@ -46,7 +46,7 @@ export default function PasswordGeneratorPage() {
 
         <GlassCard className="max-w-2xl mx-auto">
           <h3 className="text-lg font-semibold text-white mb-4 text-center">Customize Your Password</h3>
-          <PasswordGeneratorForm onPasswordGenerated={setGeneratedPassword} />
+          <PasswordGeneratorForm onPasswordGenerated={setGeneratedPassword} showUsePasswordButton={false} />
         </GlassCard>
       </div>
     </>

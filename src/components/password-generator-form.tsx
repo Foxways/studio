@@ -1,11 +1,11 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Check, Clipboard, RefreshCw, Sparkles, Send } from 'lucide-react'
+import { Check, Clipboard, RefreshCw, Send } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
 import { Button } from '@/components/ui/button'
@@ -31,9 +31,13 @@ type FormSchema = z.infer<typeof formSchema>;
 
 interface PasswordGeneratorFormProps {
     onPasswordGenerated: (password: string) => void;
+    showUsePasswordButton?: boolean;
 }
 
-export function PasswordGeneratorForm({ onPasswordGenerated }: PasswordGeneratorFormProps) {
+export function PasswordGeneratorForm({ 
+    onPasswordGenerated,
+    showUsePasswordButton = true 
+}: PasswordGeneratorFormProps) {
   const [generatedPassword, setGeneratedPassword] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const { toast } = useToast()
@@ -48,6 +52,18 @@ export function PasswordGeneratorForm({ onPasswordGenerated }: PasswordGenerator
       useSymbols: true,
     },
   })
+
+  // Generate password on initial load and when form values change
+  useEffect(() => {
+    const subscription = form.watch((values) => {
+        onGenerate(values as FormSchema);
+    });
+    // Generate initial password
+    onGenerate(form.getValues());
+    
+    return () => subscription.unsubscribe();
+  }, [form.watch]);
+
 
   const generatePassword = (values: FormSchema): string => {
     const charSets = {
@@ -64,18 +80,16 @@ export function PasswordGeneratorForm({ onPasswordGenerated }: PasswordGenerator
     if (values.useSymbols) availableChars += charSets.symbols;
 
     if (availableChars === '') {
-        toast({
-            variant: 'destructive',
-            title: 'Error',
-            description: 'Please select at least one character type.'
-        });
         return '';
     }
 
     let password = '';
+    const crypto = window.crypto || (window as any).msCrypto;
+    const array = new Uint32Array(values.length);
+    crypto.getRandomValues(array);
+
     for (let i = 0; i < values.length; i++) {
-        const randomIndex = Math.floor(Math.random() * availableChars.length);
-        password += availableChars[randomIndex];
+        password += availableChars[array[i] % availableChars.length];
     }
     return password;
   }
@@ -84,6 +98,11 @@ export function PasswordGeneratorForm({ onPasswordGenerated }: PasswordGenerator
     const newPassword = generatePassword(values);
     if (newPassword) {
       setGeneratedPassword(newPassword);
+      if (showUsePasswordButton) { // only call callback if it is not just for display
+          onPasswordGenerated(newPassword);
+      }
+    } else {
+      setGeneratedPassword(null);
     }
   }
 
@@ -108,7 +127,7 @@ export function PasswordGeneratorForm({ onPasswordGenerated }: PasswordGenerator
   return (
     <div className="space-y-6">
         <Form {...form}>
-            <form onChange={form.handleSubmit(onGenerate)} className="space-y-6">
+            <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
                  <FormField
                     control={form.control}
                     name="length"
@@ -187,7 +206,7 @@ export function PasswordGeneratorForm({ onPasswordGenerated }: PasswordGenerator
             <Label>Generated Password</Label>
             <div className="relative mt-2">
                 <p className="text-sm font-mono p-3 pr-10 bg-black/20 rounded-md break-all text-white h-11 flex items-center">
-                    {generatedPassword || <span className="text-muted-foreground">Click generate...</span>}
+                    {generatedPassword || <span className="text-muted-foreground">Adjust settings...</span>}
                 </p>
                 {generatedPassword && (
                     <Button variant="ghost" size="icon" className="absolute top-1/2 right-1 -translate-y-1/2 h-8 w-8" onClick={handleCopy}>
@@ -199,14 +218,16 @@ export function PasswordGeneratorForm({ onPasswordGenerated }: PasswordGenerator
         </div>
 
         <div className="flex gap-2">
-            <Button onClick={form.handleSubmit(onGenerate)} className="flex-1">
+            <Button onClick={() => onGenerate(form.getValues())} className="flex-1">
                 <RefreshCw className="mr-2 h-4 w-4" />
-                Generate
+                Regenerate
             </Button>
+            {showUsePasswordButton && (
              <Button onClick={handleUsePassword} variant="secondary" className="flex-1">
                 <Send className="mr-2 h-4 w-4" />
                 Use Password
             </Button>
+            )}
         </div>
     </div>
   )

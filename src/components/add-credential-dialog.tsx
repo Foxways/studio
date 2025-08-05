@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, X, Sparkles, RefreshCw, Eye, EyeOff } from 'lucide-react';
+import { Plus, X, Sparkles, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -199,7 +199,7 @@ export function AddCredentialDialog({ children, credential }: AddCredentialDialo
               </div>
                <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="secondary">
+                  <Button variant="secondary" type="button">
                     <Sparkles className="h-4 w-4" />
                     <span className='hidden sm:inline ml-2'>Generate</span>
                   </Button>
