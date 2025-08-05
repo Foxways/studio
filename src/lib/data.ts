@@ -9,6 +9,8 @@ export const users = [
         password: "password123",
         role: "User",
         active: true,
+        securityQuestion: "What was your first pet's name?",
+        securityAnswer: "Fluffy",
     },
     {
         id: "u2",
@@ -17,6 +19,8 @@ export const users = [
         password: "adminpassword",
         role: "Admin",
         active: true,
+        securityQuestion: "In what city were you born?",
+        securityAnswer: "New York",
     },
     {
         id: "u3",
@@ -25,6 +29,8 @@ export const users = [
         password: "password123",
         role: "User",
         active: true,
+        securityQuestion: "What was your first pet's name?",
+        securityAnswer: "Rex",
     },
     {
         id: "u4",
@@ -33,6 +39,8 @@ export const users = [
         password: "password123",
         role: "User",
         active: false,
+        securityQuestion: "What is your mother's maiden name?",
+        securityAnswer: "Smith",
     },
     {
         id: "u5",
@@ -41,6 +49,8 @@ export const users = [
         password: "password123",
         role: "User",
         active: true,
+        securityQuestion: "In what city were you born?",
+        securityAnswer: "Themyscira",
     }
 ]
 

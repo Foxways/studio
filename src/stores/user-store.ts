@@ -8,6 +8,8 @@ export type User = {
   password?: string;
   role: 'Admin' | 'User';
   active: boolean;
+  securityQuestion?: string;
+  securityAnswer?: string;
 };
 
 type UserState = {
@@ -15,7 +17,7 @@ type UserState = {
   toggleUserStatus: (id: string) => void;
   findUser: (id: string) => User | undefined;
   deleteUser: (id: string) => void;
-  resetPassword: (id: string) => void;
+  resetPassword: (id: string, newPassword?: string) => void;
 };
 
 export const useUserStore = create<UserState>((set, get) => ({
@@ -31,10 +33,10 @@ export const useUserStore = create<UserState>((set, get) => ({
     set((state) => ({
       users: state.users.filter((u) => u.id !== id),
     })),
-  resetPassword: (id: string) =>
+  resetPassword: (id: string, newPassword = 'password123') =>
     set((state) => ({
       users: state.users.map((u) =>
-        u.id === id ? { ...u, password: 'password123' } : u
+        u.id === id ? { ...u, password: newPassword } : u
       ),
     })),
 }));
