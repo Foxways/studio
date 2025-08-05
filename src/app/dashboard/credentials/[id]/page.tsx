@@ -56,20 +56,20 @@ export default function CredentialDetailsPage({
         title={credential.title}
         description="View and manage credential details."
       >
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => router.back()}>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+          <Button variant="outline" onClick={() => router.back()} className="w-full sm:w-auto justify-center">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
           <AddCredentialDialog credential={credential}>
-             <Button>
+             <Button className="w-full sm:w-auto justify-center">
                 <Edit className="mr-2 h-4 w-4" />
                 Edit
             </Button>
           </AddCredentialDialog>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive">
+              <Button variant="destructive" className="w-full sm:w-auto justify-center">
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete
               </Button>
@@ -136,7 +136,7 @@ export default function CredentialDetailsPage({
           </div>
           <div>
             <Label>Tags</Label>
-            <div className="flex gap-2 mt-2">
+            <div className="flex flex-wrap gap-2 mt-2">
               {credential.tags.map((tag) => (
                 <Badge key={tag} variant="secondary">
                   {tag}
@@ -156,9 +156,9 @@ export default function CredentialDetailsPage({
                     <Label>Custom Fields</Label>
                     <div className="space-y-2 mt-2">
                     {credential.customFields.map((field) => (
-                        <div key={field.id} className="flex gap-4">
-                            <p className="font-medium text-white/80 w-1/3">{field.label}:</p>
-                             <p className="text-muted-foreground w-2/3">{field.value}</p>
+                        <div key={field.id} className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+                            <p className="font-medium text-white/80 w-full sm:w-1/3">{field.label}:</p>
+                             <p className="text-muted-foreground w-full sm:w-2/3">{field.value}</p>
                         </div>
                     ))}
                     </div>

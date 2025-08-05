@@ -59,20 +59,20 @@ export default function LicenseDetailsPage({
         title={license.name}
         description="View and manage license details."
       >
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => router.back()}>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+          <Button variant="outline" onClick={() => router.back()} className="w-full sm:w-auto justify-center">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
           <AddLicenseDialog license={license}>
-             <Button>
+             <Button className="w-full sm:w-auto justify-center">
                 <Edit className="mr-2 h-4 w-4" />
                 Edit
             </Button>
           </AddLicenseDialog>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive">
+              <Button variant="destructive" className="w-full sm:w-auto justify-center">
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete
               </Button>
@@ -111,7 +111,7 @@ export default function LicenseDetailsPage({
                 </Button>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
                 <Label htmlFor="purchaseDate">Purchase Date</Label>
                 <div className="relative">

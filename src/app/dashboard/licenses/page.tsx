@@ -74,9 +74,9 @@ export default function LicensesPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Product Name</TableHead>
-              <TableHead>Product Key</TableHead>
-              <TableHead>Purchase Date</TableHead>
-              <TableHead>Expiry Date</TableHead>
+              <TableHead className="hidden md:table-cell">Product Key</TableHead>
+              <TableHead className="hidden lg:table-cell">Purchase Date</TableHead>
+              <TableHead className="hidden lg:table-cell">Expiry Date</TableHead>
               <TableHead>
                 <span className="sr-only">Actions</span>
               </TableHead>
@@ -86,9 +86,9 @@ export default function LicensesPage() {
             {licenses.map((license) => (
               <TableRow key={license.id} className="cursor-pointer" onClick={() => handleRowClick(license.id)}>
                 <TableCell className="font-medium">{license.name}</TableCell>
-                <TableCell className="font-mono text-muted-foreground">{license.productKey}</TableCell>
-                <TableCell className="text-muted-foreground">{format(new Date(license.purchaseDate), 'PPP')}</TableCell>
-                <TableCell className="text-muted-foreground">{format(new Date(license.expiryDate), 'PPP')}</TableCell>
+                <TableCell className="font-mono text-muted-foreground hidden md:table-cell">{license.productKey}</TableCell>
+                <TableCell className="text-muted-foreground hidden lg:table-cell">{format(new Date(license.purchaseDate), 'PPP')}</TableCell>
+                <TableCell className="text-muted-foreground hidden lg:table-cell">{format(new Date(license.expiryDate), 'PPP')}</TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

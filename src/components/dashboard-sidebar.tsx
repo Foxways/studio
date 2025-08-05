@@ -61,7 +61,7 @@ export default function DashboardSidebar({ isMobile = false }) {
           </Link>
         </div>
         <ScrollArea className="flex-1">
-          <div className="flex flex-col h-full justify-between">
+          <div className="flex flex-col h-full py-4">
             <nav className="grid items-start gap-1 px-2 text-sm font-medium lg:px-4">
               {mainNavLinks.map((link) => (
                 <NavLink key={link.href} {...link} />

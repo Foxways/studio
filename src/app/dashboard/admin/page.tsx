@@ -56,7 +56,7 @@ export default function AdminDashboard() {
         </GlassCard>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-5">
+      <div className="grid gap-8 grid-cols-1 lg:grid-cols-5">
         <GlassCard className="lg:col-span-3">
           <h3 className="text-lg font-medium mb-4">User Sign-ups</h3>
           <div className="h-[300px]">

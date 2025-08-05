@@ -132,10 +132,10 @@ export default function Dashboard() {
         title="Welcome to your Vault"
         description="Securely manage your passwords and sensitive information."
       >
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 w-full md:w-auto">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline">
+              <Button variant="outline" className="w-full md:w-auto justify-start">
                 <Filter className="mr-2 h-4 w-4" />
                 {tagFilter ? `Filter: ${tagFilter}` : 'Filter by tag'}
               </Button>
@@ -162,34 +162,36 @@ export default function Dashboard() {
               )}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button variant="outline" disabled={selected.length === 0}>
-            <Share2 className="mr-2 h-4 w-4" /> Share Marked
-          </Button>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive" disabled={selected.length === 0}>
-                <Trash2 className="mr-2 h-4 w-4" /> Delete Marked
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete{' '}
-                  {selected.length} selected credentials.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDeleteMarked}>
-                  Continue
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <div className="flex gap-2">
+            <Button variant="outline" disabled={selected.length === 0} className="flex-1">
+              <Share2 className="mr-2 h-4 w-4" /> Share
+            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" disabled={selected.length === 0} className="flex-1">
+                  <Trash2 className="mr-2 h-4 w-4" /> Delete
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete{' '}
+                    {selected.length} selected credentials.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDeleteMarked}>
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
 
           <AddCredentialDialog>
-            <Button>Add New</Button>
+            <Button className="w-full md:w-auto">Add New</Button>
           </AddCredentialDialog>
         </div>
       </PageHeader>
@@ -213,9 +215,9 @@ export default function Dashboard() {
                 />
               </TableHead>
               <TableHead>Title</TableHead>
-              <TableHead>Username</TableHead>
-              <TableHead>Tags</TableHead>
-              <TableHead>Last Modified</TableHead>
+              <TableHead className="hidden md:table-cell">Username</TableHead>
+              <TableHead className="hidden lg:table-cell">Tags</TableHead>
+              <TableHead className="hidden lg:table-cell">Last Modified</TableHead>
               <TableHead>
                 <span className="sr-only">Actions</span>
               </TableHead>
@@ -240,10 +242,10 @@ export default function Dashboard() {
                   />
                 </TableCell>
                 <TableCell className="font-medium">{cred.title}</TableCell>
-                <TableCell className="text-muted-foreground">
+                <TableCell className="text-muted-foreground hidden md:table-cell">
                   {cred.username}
                 </TableCell>
-                <TableCell>
+                <TableCell className="hidden lg:table-cell">
                   <div className="flex gap-1">
                     {cred.tags.map((tag) => (
                       <Badge key={tag} variant="secondary">
@@ -252,7 +254,7 @@ export default function Dashboard() {
                     ))}
                   </div>
                 </TableCell>
-                <TableCell className="text-muted-foreground">
+                <TableCell className="text-muted-foreground hidden lg:table-cell">
                   {formatDistanceToNow(new Date(cred.lastModified), {
                     addSuffix: true,
                   })}
