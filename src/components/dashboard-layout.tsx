@@ -24,7 +24,7 @@ export default function DashboardLayout({
                 {children}
               </div>
                <footer className="text-center p-4 text-muted-foreground text-sm">
-                Powered by kishanmanohar@gmail.com - V.1.0.0
+                Copyright 2025 | Powered by kishanmanohar@gmail.com - V.1.0.0
               </footer>
             </main>
         </SidebarProvider>
