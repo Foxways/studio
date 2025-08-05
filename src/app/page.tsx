@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from "next/link"
@@ -39,7 +40,13 @@ export default function LoginPage() {
         return;
       }
       login(user.email);
-      router.push("/dashboard")
+      
+      if (user.password === 'password123') {
+        router.push("/force-reset-password");
+      } else {
+        router.push("/dashboard")
+      }
+
     } else {
       toast({
         variant: "destructive",
