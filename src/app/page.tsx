@@ -56,6 +56,39 @@ export default function LoginPage() {
     }
   }
 
+  const handleBiometricLogin = async () => {
+    toast({
+        title: 'Authenticating...',
+        description: 'Please use your device\'s biometric sensor.'
+    });
+
+    // Simulate a delay for the biometric scan
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    // For this simulation, we'll try to log in a default user.
+    // In a real application, this would involve the WebAuthn API and a backend.
+    const biometricUser = users.find(u => u.email === 'user@example.com');
+
+    if (biometricUser && biometricUser.active) {
+        login(biometricUser.email);
+        toast({
+            title: 'Login Successful',
+            description: `Welcome back, ${biometricUser.name}!`
+        });
+        if (biometricUser.password === 'password123') {
+            router.push("/force-reset-password");
+        } else {
+            router.push("/dashboard");
+        }
+    } else {
+        toast({
+            variant: "destructive",
+            title: "Authentication Failed",
+            description: "Biometric login is not set up for this device or user.",
+        })
+    }
+  }
+
   return (
     <AuthLayout>
       <GlassCard className="w-full max-w-md">
@@ -103,7 +136,7 @@ export default function LoginPage() {
               </span>
             </div>
           </div>
-          <Button variant="secondary" className="w-full font-semibold">
+          <Button variant="secondary" className="w-full font-semibold" type="button" onClick={handleBiometricLogin}>
             <Fingerprint className="mr-2 h-5 w-5" />
             Login with Biometrics
           </Button>
