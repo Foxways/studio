@@ -53,7 +53,7 @@ export default function InboxPage() {
             const { id, lastModified, ...noteData } = share.itemData as any;
             addNote(noteData);
         }
-        toast({ title: 'Success', description: `Item has been added to your vault.` });
+        toast({ title: 'Success', description: `Item "${share.itemData.title}" has been added to your vault.` });
     } else {
          toast({ title: 'Error', variant: 'destructive', description: `Could not accept item.` });
     }
