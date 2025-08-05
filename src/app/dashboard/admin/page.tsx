@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from "react"
+import { useRouter } from "next/navigation";
 import { Users, KeyRound, ShieldAlert } from "lucide-react"
 import {
   Bar,
@@ -21,10 +23,41 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { PageHeader } from "@/components/page-header"
-import { adminUsers, chartData } from "@/lib/data"
+import { chartData } from "@/lib/data"
 import { GlassCard } from "@/components/glass-card"
+import { useAuthStore } from "@/stores/auth-store";
+import { useUserStore } from "@/stores/user-store";
+import { Switch } from "@/components/ui/switch";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AdminDashboard() {
+  const router = useRouter();
+  const { user } = useAuthStore();
+  const { users, toggleUserStatus } = useUserStore();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (user?.role !== 'Admin') {
+      router.push('/dashboard');
+    }
+  }, [user, router]);
+  
+  if (user?.role !== 'Admin') {
+    return (
+        <div className="flex items-center justify-center h-full">
+            <p>Access Denied. Redirecting...</p>
+        </div>
+    );
+  }
+
+  const handleStatusChange = (userId: string, active: boolean) => {
+    toggleUserStatus(userId);
+    toast({
+        title: "Success",
+        description: `User account has been ${active ? 'activated' : 'deactivated'}.`
+    });
+  };
+
   return (
     <>
       <PageHeader
@@ -37,16 +70,16 @@ export default function AdminDashboard() {
             <h3 className="text-sm font-medium">Total Users</h3>
             <Users className="h-4 w-4 text-muted-foreground" />
           </div>
-          <div className="text-2xl font-bold">1,234</div>
-          <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+          <div className="text-2xl font-bold">{users.length}</div>
+          <p className="text-xs text-muted-foreground">+2 from last month</p>
         </GlassCard>
         <GlassCard>
           <div className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <h3 className="text-sm font-medium">Credentials Stored</h3>
+            <h3 className="text-sm font-medium">Active Users</h3>
             <KeyRound className="h-4 w-4 text-muted-foreground" />
           </div>
-          <div className="text-2xl font-bold">25,841</div>
-          <p className="text-xs text-muted-foreground">+15% from last month</p>
+          <div className="text-2xl font-bold">{users.filter(u => u.active).length}</div>
+          <p className="text-xs text-muted-foreground">All active users</p>
         </GlassCard>
         <GlassCard>
           <div className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -92,22 +125,36 @@ export default function AdminDashboard() {
         </GlassCard>
 
         <GlassCard className="lg:col-span-2">
-            <h3 className="text-lg font-medium mb-4">Recent Users</h3>
+            <h3 className="text-lg font-medium mb-4">User Management</h3>
             <Table>
                 <TableHeader>
                     <TableRow>
                         <TableHead>User</TableHead>
                         <TableHead>Role</TableHead>
+                        <TableHead className="text-right">Status</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {adminUsers.map((user) => (
-                    <TableRow key={user.id}>
+                    {users.map((u) => (
+                    <TableRow key={u.id}>
                         <TableCell>
-                            <div className="font-medium">{user.name}</div>
-                            <div className="text-sm text-muted-foreground">{user.email}</div>
+                            <div className="font-medium">{u.name}</div>
+                            <div className="text-sm text-muted-foreground">{u.email}</div>
                         </TableCell>
-                        <TableCell><Badge variant={user.role === 'Admin' ? 'default' : 'secondary'}>{user.role}</Badge></TableCell>
+                        <TableCell><Badge variant={u.role === 'Admin' ? 'default' : 'secondary'}>{u.role}</Badge></TableCell>
+                        <TableCell className="text-right">
+                           <div className="flex items-center justify-end gap-2">
+                             <span className={cn("text-xs", u.active ? "text-green-400" : "text-red-400")}>
+                                {u.active ? 'Active' : 'Inactive'}
+                            </span>
+                            <Switch
+                                checked={u.active}
+                                onCheckedChange={() => handleStatusChange(u.id, !u.active)}
+                                disabled={u.email === user?.email}
+                                aria-label={`Toggle status for ${u.name}`}
+                            />
+                           </div>
+                        </TableCell>
                     </TableRow>
                     ))}
                 </TableBody>

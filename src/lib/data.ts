@@ -3,12 +3,44 @@ import { sub } from "date-fns"
 
 export const users = [
     {
+        id: "u1",
+        name: "Regular User",
         email: "user@example.com",
         password: "password123",
+        role: "User",
+        active: true,
     },
     {
+        id: "u2",
+        name: "Admin User",
         email: "admin@example.com",
-        password: "adminpassword"
+        password: "adminpassword",
+        role: "Admin",
+        active: true,
+    },
+    {
+        id: "u3",
+        name: "Bob Williams",
+        email: "bob@example.com",
+        password: "password123",
+        role: "User",
+        active: true,
+    },
+    {
+        id: "u4",
+        name: "Charlie Brown",
+        email: "charlie@example.com",
+        password: "password123",
+        role: "User",
+        active: false,
+    },
+    {
+        id: "u5",
+        name: "Diana Prince",
+        email: "diana@example.com",
+        password: "password123",
+        role: "User",
+        active: true,
     }
 ]
 

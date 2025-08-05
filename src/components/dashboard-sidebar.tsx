@@ -20,6 +20,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { ScrollArea } from "./ui/scroll-area"
+import { useAuthStore } from "@/stores/auth-store"
 
 const mainNavLinks = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -33,11 +34,14 @@ const toolLinks = [
 
 const bottomNavLinks = [
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
-  { href: "/dashboard/admin", label: "Admin", icon: UserCog },
 ]
+
+const adminLink = { href: "/dashboard/admin", label: "Admin", icon: UserCog };
+
 
 export default function DashboardSidebar({ isMobile = false }) {
   const pathname = usePathname()
+  const { user } = useAuthStore();
 
   const NavLink = ({ href, label, icon: Icon }: (typeof mainNavLinks)[0] | (typeof toolLinks)[0]) => (
     <Link
@@ -86,6 +90,9 @@ export default function DashboardSidebar({ isMobile = false }) {
               {bottomNavLinks.map((link) => (
                 <NavLink key={link.href} {...link} />
               ))}
+               {user?.role === 'Admin' && (
+                <NavLink key={adminLink.href} {...adminLink} />
+              )}
             </nav>
           </div>
         </ScrollArea>
