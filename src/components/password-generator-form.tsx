@@ -57,12 +57,13 @@ export function PasswordGeneratorForm({
   // Generate password on initial load and when form values change
   useEffect(() => {
     const subscription = form.watch((values) => {
-        onGenerate(values as FormSchema);
+        onGenerate(values as FormSchema, false); // Don't call the callback on every change
     });
     // Generate initial password
-    onGenerate(form.getValues());
+    onGenerate(form.getValues(), false);
     
     return () => subscription.unsubscribe();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.watch]);
 
 
@@ -98,11 +99,11 @@ export function PasswordGeneratorForm({
     return password;
   }
 
-  function onGenerate(values: FormSchema) {
+  function onGenerate(values: FormSchema, triggerCallback = false) {
     const newPassword = generatePassword(values);
     if (newPassword) {
       setGeneratedPassword(newPassword);
-      if (showUsePasswordButton) { // only call callback if it is not just for display
+      if (triggerCallback) {
           onPasswordGenerated(newPassword);
       }
     } else {
