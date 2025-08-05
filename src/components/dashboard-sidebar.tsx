@@ -30,7 +30,7 @@ import { ScrollArea } from "./ui/scroll-area"
 const mainNavLinks = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/dashboard/notes", label: "Notes", icon: StickyNote },
-  { href: "/dashboard/licenses", label: "Licenses", icon: BadgeInfo },
+  { href: "/dashboard/licenses", label: "Licenses", icon: KeyRound },
 ]
 
 const toolLinks = [

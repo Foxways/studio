@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PlusCircle, Plus, X, Sparkles, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -25,6 +25,8 @@ import { Badge } from './ui/badge';
 import { Textarea } from './ui/textarea';
 import { generatePasswordAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
+import { useCredentialStore, type Credential } from '@/stores/credential-store';
+import { formatDistanceToNow } from 'date-fns';
 
 const TAG_OPTIONS = ['work', 'personal', 'social', 'finance', 'development'];
 
@@ -34,7 +36,12 @@ type CustomField = {
   value: string;
 };
 
-export function AddCredentialDialog() {
+type AddCredentialDialogProps = {
+    children: React.ReactNode;
+    credential?: Credential;
+}
+
+export function AddCredentialDialog({ children, credential }: AddCredentialDialogProps) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [username, setUsername] = useState('');
@@ -45,6 +52,19 @@ export function AddCredentialDialog() {
   const [customFields, setCustomFields] = useState<CustomField[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
+  const { addCredential, updateCredential } = useCredentialStore();
+
+  useEffect(() => {
+    if (credential) {
+      setTitle(credential.title);
+      setUsername(credential.username);
+      setPassword(credential.password);
+      setUrl(credential.url || '');
+      setTags(credential.tags || []);
+      setNotes(credential.notes || '');
+      setCustomFields(credential.customFields || []);
+    }
+  }, [credential]);
 
   const handleAddCustomField = () => {
     setCustomFields([
@@ -113,16 +133,42 @@ export function AddCredentialDialog() {
   }
 
   const handleSave = () => {
-    // In a real app, you would handle form submission here
-    console.log({ title, username, password, url, tags, notes, customFields });
+    if (!title || !username || !password) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Please fill in all required fields.' });
+      return;
+    }
+    
+    const newCredential: Omit<Credential, 'id' | 'lastModified'> = {
+        title,
+        username,
+        password,
+        url,
+        tags,
+        notes,
+        customFields,
+    };
+
+    if (credential) {
+        updateCredential(credential.id, { ...newCredential, lastModified: formatDistanceToNow(new Date(), { addSuffix: true }) });
+        toast({ title: 'Success', description: 'Credential updated.' });
+    } else {
+        addCredential({
+            ...newCredential,
+            id: Date.now().toString(),
+            lastModified: 'just now',
+        });
+        toast({ title: 'Success', description: 'Credential saved.' });
+    }
+    
     resetForm();
     setOpen(false);
-    toast({ title: 'Success', description: 'Credential saved.' });
   };
   
   const handleOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
-      resetForm();
+      if (!credential) { // Only reset if it's "Add New", not "Edit"
+        resetForm();
+      }
     }
     setOpen(isOpen);
   }
@@ -130,21 +176,23 @@ export function AddCredentialDialog() {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button>
-          <PlusCircle className="mr-2 h-4 w-4" /> Add New
-        </Button>
+        {children}
       </DialogTrigger>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Add New Credential</DialogTitle>
+          <DialogTitle>{credential ? 'Edit Credential' : 'Add New Credential'}</DialogTitle>
           <DialogDescription>
-            Fill in the details for the new credential. Click save when you're done.
+            {credential ? 'Update the details for this credential.' : "Fill in the details for the new credential. Click save when you're done."}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4 max-h-[60vh] overflow-y-auto pr-4">
           <div className="space-y-2">
             <Label htmlFor="title">Title</Label>
             <Input id="title" placeholder="e.g. Google" value={title} onChange={(e) => setTitle(e.target.value)} />
+          </div>
+           <div className="space-y-2">
+            <Label htmlFor="url">URL</Label>
+            <Input id="url" placeholder="https://google.com" value={url} onChange={(e) => setUrl(e.target.value)} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="username">Username / Email</Label>
@@ -160,10 +208,7 @@ export function AddCredentialDialog() {
               </Button>
             </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="url">URL</Label>
-            <Input id="url" placeholder="https://google.com" value={url} onChange={(e) => setUrl(e.target.value)} />
-          </div>
+         
           <div className="space-y-2">
             <Label>Tags</Label>
             <div className="flex flex-wrap gap-2">

@@ -1,7 +1,19 @@
 'use client';
 
-import { PlusCircle, MoreHorizontal, Share2, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { MoreHorizontal, Share2, Trash2 } from 'lucide-react';
 import Link from 'next/link';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -21,16 +33,43 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { PageHeader } from '@/components/page-header';
-import { credentials } from '@/lib/data';
 import { GlassCard } from '@/components/glass-card';
 import { AddCredentialDialog } from '@/components/add-credential-dialog';
 import { useRouter } from 'next/navigation';
+import { useCredentialStore } from '@/stores/credential-store';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Dashboard() {
   const router = useRouter();
+  const { credentials, deleteCredential, deleteCredentials } =
+    useCredentialStore();
+  const [selected, setSelected] = useState<string[]>([]);
+  const { toast } = useToast();
 
   const handleRowClick = (credId: string) => {
     router.push(`/dashboard/credentials/${credId}`);
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelected(credentials.map((c) => c.id));
+    } else {
+      setSelected([]);
+    }
+  };
+
+  const handleSelectOne = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelected([...selected, id]);
+    } else {
+      setSelected(selected.filter((sId) => sId !== id));
+    }
+  };
+  
+  const handleDeleteMarked = () => {
+    deleteCredentials(selected);
+    toast({ title: 'Success', description: `${selected.length} credentials deleted.` });
+    setSelected([]);
   };
 
   return (
@@ -40,13 +79,32 @@ export default function Dashboard() {
         description="Securely manage your passwords and sensitive information."
       >
         <div className="flex items-center gap-2">
-          <Button variant="outline">
+          <Button variant="outline" disabled={selected.length === 0}>
             <Share2 className="mr-2 h-4 w-4" /> Share Marked
           </Button>
-          <Button variant="destructive">
-            <Trash2 className="mr-2 h-4 w-4" /> Delete Marked
-          </Button>
-          <AddCredentialDialog />
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" disabled={selected.length === 0}>
+                <Trash2 className="mr-2 h-4 w-4" /> Delete Marked
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete {selected.length} selected credentials.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDeleteMarked}>Continue</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
+          <AddCredentialDialog>
+            <Button>Add New</Button>
+          </AddCredentialDialog>
         </div>
       </PageHeader>
 
@@ -55,7 +113,13 @@ export default function Dashboard() {
           <TableHeader>
             <TableRow>
               <TableHead className="w-[40px]">
-                <Checkbox />
+                <Checkbox
+                  checked={
+                    credentials.length > 0 &&
+                    selected.length === credentials.length
+                  }
+                  onCheckedChange={handleSelectAll}
+                />
               </TableHead>
               <TableHead>Title</TableHead>
               <TableHead>Username</TableHead>
@@ -77,7 +141,12 @@ export default function Dashboard() {
                   onClick={(e) => e.stopPropagation()}
                   className="w-[40px]"
                 >
-                  <Checkbox />
+                  <Checkbox
+                    checked={selected.includes(cred.id)}
+                    onCheckedChange={(checked) =>
+                      handleSelectOne(cred.id, !!checked)
+                    }
+                  />
                 </TableCell>
                 <TableCell className="font-medium">{cred.title}</TableCell>
                 <TableCell className="text-muted-foreground">
@@ -104,15 +173,29 @@ export default function Dashboard() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem asChild>
-                        <Link href={`/dashboard/credentials/${cred.id}`}>
-                          Edit
-                        </Link>
-                      </DropdownMenuItem>
+                       <AddCredentialDialog credential={cred}>
+                         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>Edit</DropdownMenuItem>
+                       </AddCredentialDialog>
                       <DropdownMenuItem>Share</DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-500">
-                        Delete
-                      </DropdownMenuItem>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                           <DropdownMenuItem className="text-red-500" onSelect={(e) => e.preventDefault()}>Delete</DropdownMenuItem>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete this credential.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => deleteCredential(cred.id)}>
+                              Continue
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>

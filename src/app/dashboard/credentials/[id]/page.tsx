@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Edit, Trash2, Eye, EyeOff } from 'lucide-react';
-import { credentials } from '@/lib/data';
+import { useCredentialStore } from '@/stores/credential-store';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { GlassCard } from '@/components/glass-card';
@@ -11,6 +11,19 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { notFound } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { AddCredentialDialog } from '@/components/add-credential-dialog';
 
 export default function CredentialDetailsPage({
   params,
@@ -18,12 +31,23 @@ export default function CredentialDetailsPage({
   params: { id: string };
 }) {
   const router = useRouter();
-  const credential = credentials.find((c) => c.id === params.id);
+  const { findCredential, deleteCredential } = useCredentialStore();
+  const credential = findCredential(params.id);
   const [showPassword, setShowPassword] = useState(false);
+  const { toast } = useToast();
 
   if (!credential) {
     return notFound();
   }
+
+  const handleDelete = () => {
+    deleteCredential(credential.id);
+    toast({
+      title: 'Success',
+      description: 'Credential deleted successfully.',
+    });
+    router.push('/dashboard');
+  };
 
   return (
     <>
@@ -36,14 +60,35 @@ export default function CredentialDetailsPage({
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
-          <Button>
-            <Edit className="mr-2 h-4 w-4" />
-            Edit
-          </Button>
-          <Button variant="destructive">
-            <Trash2 className="mr-2 h-4 w-4" />
-            Delete
-          </Button>
+          <AddCredentialDialog credential={credential}>
+             <Button>
+                <Edit className="mr-2 h-4 w-4" />
+                Edit
+            </Button>
+          </AddCredentialDialog>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive">
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete
+                  this credential.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDelete}>
+                  Continue
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </PageHeader>
       <GlassCard className="max-w-2xl mx-auto">
@@ -51,6 +96,10 @@ export default function CredentialDetailsPage({
           <div>
             <Label htmlFor="title">Title</Label>
             <Input id="title" value={credential.title} readOnly />
+          </div>
+           <div>
+            <Label htmlFor="url">URL</Label>
+            <Input id="url" value={credential.url} readOnly />
           </div>
           <div>
             <Label htmlFor="username">Username</Label>
@@ -94,6 +143,26 @@ export default function CredentialDetailsPage({
               ))}
             </div>
           </div>
+           {credential.notes && (
+            <div>
+                <Label>Notes</Label>
+                <p className="text-sm text-muted-foreground mt-2 p-4 bg-black/20 rounded-md whitespace-pre-wrap">{credential.notes}</p>
+            </div>
+            )}
+
+            {credential.customFields && credential.customFields.length > 0 && (
+                 <div>
+                    <Label>Custom Fields</Label>
+                    <div className="space-y-2 mt-2">
+                    {credential.customFields.map((field) => (
+                        <div key={field.id} className="flex gap-4">
+                            <p className="font-medium text-white/80 w-1/3">{field.label}:</p>
+                             <p className="text-muted-foreground w-2/3">{field.value}</p>
+                        </div>
+                    ))}
+                    </div>
+                </div>
+            )}
           <div>
             <p className="text-sm text-muted-foreground">
               Last Modified: {credential.lastModified}
