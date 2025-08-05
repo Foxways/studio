@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/form'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Slider } from '@/components/ui/slider'
+import { Label } from './ui/label'
 
 const formSchema = z.object({
   length: z.number().min(8).max(128),
@@ -80,7 +81,10 @@ export function PasswordGeneratorForm({
     if (values.useSymbols) availableChars += charSets.symbols;
 
     if (availableChars === '') {
+        form.setError('useLowercase', { type: 'manual', message: 'Select at least one character type.' });
         return '';
+    } else {
+        form.clearErrors('useLowercase');
     }
 
     let password = '';
@@ -199,6 +203,9 @@ export function PasswordGeneratorForm({
                     )}
                     />
                 </div>
+                 {form.formState.errors.useLowercase && (
+                    <p className="text-sm font-medium text-destructive">{form.formState.errors.useLowercase.message}</p>
+                )}
             </form>
         </Form>
 
