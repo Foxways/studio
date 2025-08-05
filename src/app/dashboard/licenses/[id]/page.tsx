@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Edit, Trash2, Calendar, KeyRound } from 'lucide-react';
 import { useLicenseStore } from '@/stores/license-store';

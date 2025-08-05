@@ -31,8 +31,7 @@ export function NoteCard({ note }: { note: Note }) {
   const { deleteNote } = useNoteStore();
   const { toast } = useToast();
 
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleDelete = () => {
     deleteNote(note.id);
     toast({ title: 'Success', description: 'Note deleted.' });
   };
@@ -46,46 +45,46 @@ export function NoteCard({ note }: { note: Note }) {
             <Badge variant="secondary" className="mb-2">
             {note.category}
             </Badge>
-            <DropdownMenu>
-            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                <Button
-                aria-haspopup="true"
-                size="icon"
-                variant="ghost"
-                className="-mt-2 -mr-2"
-                >
-                <MoreHorizontal className="h-4 w-4" />
-                <span className="sr-only">Toggle menu</span>
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-                <AddNoteDialog note={note}>
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                    Edit
-                </DropdownMenuItem>
-                </AddNoteDialog>
-                <DropdownMenuItem>Share</DropdownMenuItem>
-                <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                        <DropdownMenuItem className="text-red-500" onSelect={(e) => e.preventDefault()}>Delete</DropdownMenuItem>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete this note.
-                        </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDelete}>
-                            Continue
-                        </AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
-            </DropdownMenuContent>
-            </DropdownMenu>
+            <AlertDialog>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                    <Button
+                    aria-haspopup="true"
+                    size="icon"
+                    variant="ghost"
+                    className="-mt-2 -mr-2"
+                    >
+                    <MoreHorizontal className="h-4 w-4" />
+                    <span className="sr-only">Toggle menu</span>
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                    <AddNoteDialog note={note}>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                        Edit
+                    </DropdownMenuItem>
+                    </AddNoteDialog>
+                    <DropdownMenuItem>Share</DropdownMenuItem>
+                      <AlertDialogTrigger asChild>
+                          <DropdownMenuItem className="text-red-500" onSelect={(e) => e.preventDefault()}>Delete</DropdownMenuItem>
+                      </AlertDialogTrigger>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                  <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete this note.
+                  </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete}>
+                      Continue
+                  </AlertDialogAction>
+                  </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
         </div>
         <h3 className="text-lg font-semibold text-white mb-2">{note.title}</h3>
         <p className="text-sm text-muted-foreground flex-grow">{excerpt}</p>
