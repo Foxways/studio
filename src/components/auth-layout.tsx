@@ -17,7 +17,7 @@ export function AuthLayout({ children }: PropsWithChildren) {
             {children}
         </div>
         <footer className="w-full text-center p-4 text-muted-foreground text-sm">
-            Powered by kishanmanohar@gmail.com
+            Powered by kishanmanohar@gmail.com - V.1.0.0
         </footer>
       </div>
     </main>
