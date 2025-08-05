@@ -284,14 +284,14 @@ export default function Dashboard() {
                                 Share
                             </DropdownMenuItem>
                          </ShareDialog>
-                          <AlertDialogTrigger asChild>
-                            <DropdownMenuItem
-                              className="text-red-500"
-                              onSelect={(e) => e.preventDefault()}
-                            >
-                              Delete
-                            </DropdownMenuItem>
-                          </AlertDialogTrigger>
+                        <AlertDialogTrigger asChild>
+                          <DropdownMenuItem
+                            className="text-red-500"
+                            onSelect={(e) => e.preventDefault()}
+                          >
+                            Delete
+                          </DropdownMenuItem>
+                        </AlertDialogTrigger>
                       </DropdownMenuContent>
                     </DropdownMenu>
                     <AlertDialogContent>
