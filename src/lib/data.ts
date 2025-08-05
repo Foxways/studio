@@ -48,28 +48,28 @@ export const notes = [
         id: "n1",
         title: "Project Phoenix Ideas",
         category: "Work",
-        excerpt: "Initial brainstorming for the new project architecture...",
+        content: "Initial brainstorming for the new project architecture, focusing on a microservices-based approach with a central API gateway. Key technologies to investigate: gRPC for inter-service communication, Kubernetes for orchestration, and possibly a service mesh like Istio for observability and traffic management.",
         lastModified: "4 hours ago",
     },
     {
         id: "n2",
         title: "Grocery List",
         category: "Personal",
-        excerpt: "Milk, bread, cheese, and coffee beans.",
+        content: "Milk, bread, cheese, coffee beans, avocados, chicken breast, olive oil, and some dark chocolate.",
         lastModified: "Yesterday",
     },
     {
         id: "n3",
         title: "API Keys",
         category: "Development",
-        excerpt: "Stripe: pk_test_... | SendGrid: SG...",
+        content: "Stripe: pk_test_xxxxxxxxxx\nSendGrid: SG.xxxxxxxxxx\nGoogle Maps: AIzaSyxxxxxxxxxx",
         lastModified: "2 days ago",
     },
     {
         id: "n4",
         title: "Meeting Notes 2024-07-20",
         category: "Work",
-        excerpt: "Q3 planning session. Key takeaways: focus on user retention...",
+        content: "Q3 planning session. Key takeaways:\n- Focus on user retention by implementing a new onboarding flow.\n- Increase marketing spend on social media channels.\n- A/B test the new pricing page before full rollout.",
         lastModified: "4 days ago",
     }
 ]
