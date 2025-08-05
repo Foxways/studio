@@ -28,7 +28,7 @@ import {
 import { PageHeader } from "@/components/page-header"
 import { GlassCard } from "@/components/glass-card"
 import { useToast } from "@/hooks/use-toast";
-import { useShareStore } from "@/stores/share-store";
+import { useShareStore, type SharedItem } from "@/stores/share-store";
 import { useAuthStore } from "@/stores/auth-store";
 import { useCredentialStore } from "@/stores/credential-store";
 import { useNoteStore } from "@/stores/note-store";
@@ -43,13 +43,13 @@ export default function InboxPage() {
 
   const inboxItems = user ? getInbox(user.email) : [];
 
-  const handleAccept = (shareId: string) => {
-    const item = acceptShare(shareId);
-    if (item) {
+  const handleAccept = (share: SharedItem) => {
+    const item = acceptShare(share.id);
+    if (item && share.itemData) {
         if (item.itemType === 'credential') {
-            addCredential(item.itemData);
+            addCredential(share.itemData);
         } else {
-            addNote(item.itemData);
+            addNote(share.itemData);
         }
         toast({ title: 'Success', description: `Item has been added to your vault.` });
     }
@@ -82,13 +82,13 @@ export default function InboxPage() {
             {inboxItems.map((item) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{item.senderEmail}</TableCell>
-                <TableCell>{item.itemData.title}</TableCell>
+                <TableCell>{item.itemData?.title}</TableCell>
                 <TableCell className="hidden md:table-cell">
                     <Badge variant="outline" className="capitalize">{item.itemType}</Badge>
                 </TableCell>
                 <TableCell className="text-muted-foreground hidden lg:table-cell">{formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}</TableCell>
                 <TableCell className="text-right">
-                   <Button variant="ghost" size="icon" onClick={() => handleAccept(item.id)}>
+                   <Button variant="ghost" size="icon" onClick={() => handleAccept(item)}>
                     <Check className="h-4 w-4 text-green-400"/>
                     <span className="sr-only">Accept</span>
                    </Button>

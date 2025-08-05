@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Send, Trash2 } from "lucide-react"
@@ -57,16 +58,14 @@ export default function OutboxPage() {
               <TableHead>Item</TableHead>
               <TableHead className="hidden md:table-cell">Status</TableHead>
               <TableHead className="hidden lg:table-cell">Sent</TableHead>
-              <TableHead>
-                <span className="sr-only">Actions</span>
-              </TableHead>
+              <TableHead className="text-right">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {outboxItems.map((item) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{item.recipientEmail}</TableCell>
-                <TableCell>{item.itemData.title}</TableCell>
+                <TableCell>{item.itemData?.title}</TableCell>
                  <TableCell className="hidden md:table-cell">
                     <Badge variant={item.status === 'accepted' ? 'default' : 'secondary'} className="capitalize">{item.status}</Badge>
                 </TableCell>
@@ -74,7 +73,7 @@ export default function OutboxPage() {
                 <TableCell className="text-right">
                    <AlertDialog>
                       <AlertDialogTrigger asChild>
-                         <Button variant="ghost" size="icon">
+                         <Button variant="ghost" size="icon" disabled={item.status === 'accepted'}>
                             <Trash2 className="h-4 w-4 text-red-400"/>
                              <span className="sr-only">Revoke</span>
                         </Button>

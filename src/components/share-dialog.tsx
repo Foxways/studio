@@ -19,8 +19,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useShareStore, type ItemType } from '@/stores/share-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { useUserStore } from '@/stores/user-store';
-import { useCredentialStore } from '@/stores/credential-store';
-import { useNoteStore } from '@/stores/note-store';
 import { Badge } from './ui/badge';
 import { cn } from '@/lib/utils';
 
@@ -38,9 +36,7 @@ export function ShareDialog({ children, itemIds, itemType, disabled = false }: S
   const { toast } = useToast();
   const { user: currentUser } = useAuthStore();
   const { users } = useUserStore();
-  const { shareItem } = useShareStore();
-  const { findCredential } = useCredentialStore();
-  const { findNote } = useNoteStore();
+  const { shareItems } = useShareStore();
 
   const handleEmailInput = (e: KeyboardEvent<HTMLInputElement>) => {
     if (['Enter', ' ', ','].includes(e.key) && currentEmail) {
@@ -76,37 +72,33 @@ export function ShareDialog({ children, itemIds, itemType, disabled = false }: S
       return;
     }
 
-    let itemsShared = false;
+    const validRecipients: string[] = [];
+    let hasError = false;
 
     allRecipients.forEach(email => {
-        const recipient = users.find((u) => u.email === email);
-        if (!recipient) {
-          toast({ variant: 'destructive', title: 'User not found', description: `User with email ${email} does not exist.` });
-          return;
-        }
-        if (recipient.email === currentUser?.email) {
+        if (email === currentUser?.email) {
           toast({ variant: 'destructive', title: 'Cannot share with yourself', description: 'You cannot share items with your own account.' });
+          hasError = true;
           return;
         }
-
-        itemIds.forEach((id) => {
-            const itemData = itemType === 'credential' ? findCredential(id) : findNote(id);
-            if (itemData && currentUser) {
-                shareItem(currentUser.email, recipient.email, itemData);
-                itemsShared = true;
-            }
-        });
-
-         if (itemIds.length > 0) {
-             toast({
-                title: 'Success',
-                description: `${itemIds.length} item(s) shared successfully with ${email}.`,
-            });
-         }
+        const recipientExists = users.some((u) => u.email === email);
+        if (!recipientExists) {
+          toast({ variant: 'destructive', title: 'User not found', description: `User with email ${email} does not exist.` });
+          hasError = true;
+          return;
+        }
+        validRecipients.push(email);
     });
 
+    if (validRecipients.length > 0) {
+        shareItems(currentUser!.email, validRecipients, itemIds, itemType);
+        toast({
+            title: 'Success',
+            description: `Item(s) shared successfully with ${validRecipients.join(', ')}.`,
+        });
+    }
 
-    if(itemsShared) {
+    if(!hasError) {
         handleOpenChange(false);
     }
   };
