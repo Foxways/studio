@@ -197,7 +197,7 @@ export function AddCredentialDialog({ children, credential }: AddCredentialDialo
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
               <div className="relative flex-grow">
                  <Input 
                   id="password" 
@@ -219,7 +219,7 @@ export function AddCredentialDialog({ children, credential }: AddCredentialDialo
               </div>
               <Button variant="secondary" onClick={handleGeneratePassword} disabled={isGenerating}>
                 {isGenerating ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                <span className='hidden sm:inline'>Generate</span>
+                <span className='hidden sm:inline ml-2'>Generate</span>
               </Button>
             </div>
           </div>

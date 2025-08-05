@@ -92,6 +92,7 @@ export default function InboxPage() {
                 </TableCell>
                 <TableCell className="text-muted-foreground hidden lg:table-cell">{formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}</TableCell>
                 <TableCell className="text-right">
+                  <div className="flex justify-end gap-2">
                    <Button variant="ghost" size="icon" onClick={() => handleAccept(item)}>
                     <Check className="h-4 w-4 text-green-400"/>
                     <span className="sr-only">Accept</span>
@@ -118,6 +119,7 @@ export default function InboxPage() {
                         </AlertDialogFooter>
                       </AlertDialogContent>
                    </AlertDialog>
+                   </div>
                 </TableCell>
               </TableRow>
             ))}

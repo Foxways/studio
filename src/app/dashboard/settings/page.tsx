@@ -141,7 +141,7 @@ export default function SettingsPage() {
             <h3 className="text-lg font-medium text-white mb-4">Appearance</h3>
             <div className="flex items-center justify-between">
                 <p className="text-muted-foreground">Theme</p>
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
                     <Button variant="outline" size="icon">
                         <Sun className="h-5 w-5" />
                     </Button>
