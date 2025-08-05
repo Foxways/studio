@@ -14,6 +14,8 @@ type UserState = {
   users: User[];
   toggleUserStatus: (id: string) => void;
   findUser: (id: string) => User | undefined;
+  deleteUser: (id: string) => void;
+  resetPassword: (id: string) => void;
 };
 
 export const useUserStore = create<UserState>((set, get) => ({
@@ -25,4 +27,14 @@ export const useUserStore = create<UserState>((set, get) => ({
       ),
     })),
   findUser: (id) => get().users.find((u) => u.id === id),
+  deleteUser: (id) =>
+    set((state) => ({
+      users: state.users.filter((u) => u.id !== id),
+    })),
+  resetPassword: (id: string) =>
+    set((state) => ({
+      users: state.users.map((u) =>
+        u.id === id ? { ...u, password: 'password123' } : u
+      ),
+    })),
 }));
