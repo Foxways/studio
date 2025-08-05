@@ -21,7 +21,7 @@ import { Slider } from '@/components/ui/slider'
 import { PageHeader } from '@/components/page-header'
 import { GlassCard } from '@/components/glass-card'
 import type { GenerateAdvancedPasswordOutput } from '@/ai/flows/advanced-password-generator'
-import { generatePasswordAction } from '@/lib/actions'
+import { analyzePasswordAction } from '@/lib/actions'
 import { useToast } from '@/hooks/use-toast'
 
 const formSchema = z.object({
@@ -32,13 +32,15 @@ const formSchema = z.object({
   useSymbols: z.boolean().default(true),
 })
 
+type FormSchema = z.infer<typeof formSchema>;
+
 export default function PasswordGeneratorPage() {
   const [result, setResult] = useState<GenerateAdvancedPasswordOutput | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [copied, setCopied] = useState(false)
   const { toast } = useToast()
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       length: 16,
@@ -49,21 +51,63 @@ export default function PasswordGeneratorPage() {
     },
   })
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  const generatePassword = (values: FormSchema): string => {
+    const charSets = {
+        lowercase: 'abcdefghijklmnopqrstuvwxyz',
+        uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+        numbers: '0123456789',
+        symbols: '!@#$%^&*()_+-=[]{}|;:,.<>?'
+    };
+
+    let availableChars = '';
+    if (values.useLowercase) availableChars += charSets.lowercase;
+    if (values.useUppercase) availableChars += charSets.uppercase;
+    if (values.useNumbers) availableChars += charSets.numbers;
+    if (values.useSymbols) availableChars += charSets.symbols;
+
+    if (availableChars === '') {
+        toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: 'Please select at least one character type.'
+        });
+        return '';
+    }
+
+    let password = '';
+    for (let i = 0; i < values.length; i++) {
+        const randomIndex = Math.floor(Math.random() * availableChars.length);
+        password += availableChars[randomIndex];
+    }
+    return password;
+  }
+
+  async function onSubmit(values: FormSchema) {
     setIsLoading(true)
     setResult(null)
-    const response = await generatePasswordAction({
-      ...values,
-      complexityLevel: 'high',
-    })
 
-    if (response.success && response.data) {
-      setResult(response.data)
+    const newPassword = generatePassword(values);
+    if (!newPassword) {
+        setIsLoading(false);
+        return;
+    }
+    
+    const analysisResponse = await analyzePasswordAction({ password: newPassword });
+
+    if (analysisResponse.success && analysisResponse.data) {
+       setResult({
+        password: newPassword,
+        reasoning: analysisResponse.data.reasoning || 'Could not retrieve AI analysis.'
+      });
     } else {
+      setResult({
+        password: newPassword,
+        reasoning: 'AI analysis failed, but your password has been generated.'
+      });
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: response.error,
+        title: 'Analysis Error',
+        description: analysisResponse.error,
       })
     }
     setIsLoading(false)
@@ -82,7 +126,7 @@ export default function PasswordGeneratorPage() {
     <>
       <PageHeader
         title="Advanced Password Generator"
-        description="Let AI craft a strong, unique password for you."
+        description="Craft a strong, unique password for you."
       />
       <div className="grid gap-8 lg:grid-cols-2">
         <GlassCard>
