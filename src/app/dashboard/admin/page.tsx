@@ -1,3 +1,5 @@
+'use client';
+
 import { Users, KeyRound, ShieldAlert } from "lucide-react"
 import {
   Bar,
