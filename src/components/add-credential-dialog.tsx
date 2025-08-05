@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { PlusCircle, Plus, X, Sparkles, RefreshCw } from 'lucide-react';
+import { Plus, X, Sparkles, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -25,7 +25,6 @@ import { Badge } from './ui/badge';
 import { Textarea } from './ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useCredentialStore, type Credential } from '@/stores/credential-store';
-import { formatDistanceToNow } from 'date-fns';
 
 const TAG_OPTIONS = ['work', 'personal', 'social', 'finance', 'development'];
 
@@ -54,7 +53,7 @@ export function AddCredentialDialog({ children, credential }: AddCredentialDialo
   const { addCredential, updateCredential } = useCredentialStore();
 
   useEffect(() => {
-    if (credential) {
+    if (open && credential) {
       setTitle(credential.title);
       setUsername(credential.username);
       setPassword(credential.password);
@@ -62,8 +61,10 @@ export function AddCredentialDialog({ children, credential }: AddCredentialDialo
       setTags(credential.tags || []);
       setNotes(credential.notes || '');
       setCustomFields(credential.customFields || []);
+    } else if (!open) {
+      resetForm();
     }
-  }, [credential]);
+  }, [credential, open]);
 
   const handleAddCustomField = () => {
     setCustomFields([
@@ -140,7 +141,7 @@ export function AddCredentialDialog({ children, credential }: AddCredentialDialo
       return;
     }
     
-    const newCredential: Omit<Credential, 'id' | 'lastModified'> = {
+    const newCredentialData = {
         title,
         username,
         password,
@@ -151,14 +152,10 @@ export function AddCredentialDialog({ children, credential }: AddCredentialDialo
     };
 
     if (credential) {
-        updateCredential(credential.id, { ...newCredential, lastModified: formatDistanceToNow(new Date(), { addSuffix: true }) });
+        updateCredential(credential.id, newCredentialData);
         toast({ title: 'Success', description: 'Credential updated.' });
     } else {
-        addCredential({
-            ...newCredential,
-            id: Date.now().toString(),
-            lastModified: 'just now',
-        });
+        addCredential(newCredentialData);
         toast({ title: 'Success', description: 'Credential saved.' });
     }
     
@@ -167,11 +164,6 @@ export function AddCredentialDialog({ children, credential }: AddCredentialDialo
   };
   
   const handleOpenChange = (isOpen: boolean) => {
-    if (!isOpen) {
-      if (!credential) { // Only reset if it's "Add New", not "Edit"
-        resetForm();
-      }
-    }
     setOpen(isOpen);
   }
 

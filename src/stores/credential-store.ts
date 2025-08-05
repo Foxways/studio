@@ -6,32 +6,36 @@ export type Credential = {
   title: string;
   username: string;
   password: string;
-  url?: string;
+  url: string;
   tags: string[];
   notes?: string;
   customFields?: { id: number; label: string; value: string }[];
-  lastModified: string;
+  lastModified: string; // Stored as ISO string
 };
 
 type CredentialState = {
   credentials: Credential[];
-  addCredential: (credential: Credential) => void;
-  updateCredential: (id: string, updatedCredential: Omit<Credential, 'id'>) => void;
+  addCredential: (credential: Omit<Credential, 'id' | 'lastModified'>) => void;
+  updateCredential: (id: string, updatedCredential: Omit<Credential, 'id' | 'lastModified'>) => void;
   deleteCredential: (id: string) => void;
   deleteCredentials: (ids: string[]) => void;
   findCredential: (id: string) => Credential | undefined;
 };
 
 export const useCredentialStore = create<CredentialState>((set, get) => ({
-  credentials: initialCredentials.map(c => ({...c, url: `https://www.${c.title.split(' ')[0].toLowerCase()}.com`})),
+  credentials: initialCredentials,
   addCredential: (credential) =>
     set((state) => ({
-      credentials: [...state.credentials, credential],
+      credentials: [{ 
+        ...credential,
+        id: Date.now().toString(),
+        lastModified: new Date().toISOString()
+      }, ...state.credentials],
     })),
   updateCredential: (id, updatedCredential) =>
     set((state) => ({
       credentials: state.credentials.map((c) =>
-        c.id === id ? { ...c, ...updatedCredential, id } : c
+        c.id === id ? { ...c, ...updatedCredential, id, lastModified: new Date().toISOString() } : c
       ),
     })),
   deleteCredential: (id) =>

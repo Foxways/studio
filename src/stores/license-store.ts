@@ -1,13 +1,12 @@
 import { create } from 'zustand';
 import { licenses as initialLicenses } from '@/lib/data';
-import { format } from 'date-fns';
 
 export type License = {
   id: string;
   name: string;
   productKey: string;
-  purchaseDate: string;
-  expiryDate: string;
+  purchaseDate: string; // Stored as ISO string
+  expiryDate: string; // Stored as ISO string
 };
 
 type LicenseState = {

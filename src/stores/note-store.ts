@@ -1,13 +1,12 @@
 import { create } from 'zustand';
 import { notes as initialNotes } from '@/lib/data';
-import { formatDistanceToNow } from 'date-fns';
 
 export type Note = {
   id: string;
   title: string;
   category: string;
   content: string;
-  lastModified: string;
+  lastModified: string; // Stored as ISO string
 };
 
 type NoteState = {
@@ -23,7 +22,7 @@ export const useNoteStore = create<NoteState>((set, get) => ({
   addNote: (note) =>
     set((state) => ({
       notes: [
-        { ...note, id: Date.now().toString(), lastModified: 'just now' },
+        { ...note, id: Date.now().toString(), lastModified: new Date().toISOString() },
         ...state.notes,
       ],
     })),
@@ -35,9 +34,7 @@ export const useNoteStore = create<NoteState>((set, get) => ({
               ...n,
               ...updatedNote,
               id,
-              lastModified: formatDistanceToNow(new Date(), {
-                addSuffix: true,
-              }),
+              lastModified: new Date().toISOString(),
             }
           : n
       ),

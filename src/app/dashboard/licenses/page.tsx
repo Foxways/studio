@@ -34,6 +34,7 @@ import { useLicenseStore } from "@/stores/license-store";
 import { GlassCard } from "@/components/glass-card"
 import { AddLicenseDialog } from "@/components/add-license-dialog";
 import { useToast } from "@/hooks/use-toast";
+import { format } from 'date-fns';
 
 export default function LicensesPage() {
   const router = useRouter();
@@ -49,7 +50,8 @@ export default function LicensesPage() {
     toast({ title: 'Success', description: 'License deleted.' });
   }
 
-  const handleCopy = (key: string) => {
+  const handleCopy = (e: React.MouseEvent, key: string) => {
+    e.stopPropagation();
     navigator.clipboard.writeText(key);
     toast({ title: 'Success', description: 'Product key copied to clipboard.' });
   }
@@ -85,8 +87,8 @@ export default function LicensesPage() {
               <TableRow key={license.id} className="cursor-pointer" onClick={() => handleRowClick(license.id)}>
                 <TableCell className="font-medium">{license.name}</TableCell>
                 <TableCell className="font-mono text-muted-foreground">{license.productKey}</TableCell>
-                <TableCell className="text-muted-foreground">{license.purchaseDate}</TableCell>
-                <TableCell className="text-muted-foreground">{license.expiryDate}</TableCell>
+                <TableCell className="text-muted-foreground">{format(new Date(license.purchaseDate), 'PPP')}</TableCell>
+                <TableCell className="text-muted-foreground">{format(new Date(license.expiryDate), 'PPP')}</TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -99,7 +101,7 @@ export default function LicensesPage() {
                       <AddLicenseDialog license={license}>
                         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>Edit</DropdownMenuItem>
                       </AddLicenseDialog>
-                      <DropdownMenuItem onClick={() => handleCopy(license.productKey)}>Copy Key</DropdownMenuItem>
+                      <DropdownMenuItem onClick={(e) => handleCopy(e, license.productKey)}>Copy Key</DropdownMenuItem>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                            <DropdownMenuItem className="text-red-500" onSelect={(e) => e.preventDefault()}>Delete</DropdownMenuItem>

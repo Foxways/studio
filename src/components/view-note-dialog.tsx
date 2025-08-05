@@ -15,6 +15,7 @@ import { ScrollArea } from './ui/scroll-area';
 import { type Note } from '@/stores/note-store';
 import { AddNoteDialog } from './add-note-dialog';
 import { useState } from 'react';
+import { formatDistanceToNow } from 'date-fns';
 
 type ViewNoteDialogProps = {
   children: React.ReactNode;
@@ -32,7 +33,7 @@ export function ViewNoteDialog({ children, note }: ViewNoteDialogProps) {
           <DialogTitle className="text-2xl">{note.title}</DialogTitle>
           <DialogDescription className="flex items-center gap-4 pt-2">
              <Badge variant="secondary" className="text-sm">{note.category}</Badge>
-             <span className="text-xs text-muted-foreground">Last updated: {note.lastModified}</span>
+             <span className="text-xs text-muted-foreground">Last updated: {formatDistanceToNow(new Date(note.lastModified), { addSuffix: true })}</span>
           </DialogDescription>
         </DialogHeader>
         <ScrollArea className="max-h-[60vh] my-4">

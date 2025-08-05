@@ -25,12 +25,14 @@ import { useToast } from '@/hooks/use-toast';
 import { useNoteStore, type Note } from '@/stores/note-store';
 import { AddNoteDialog } from './add-note-dialog';
 import { ViewNoteDialog } from './view-note-dialog';
+import { formatDistanceToNow } from 'date-fns';
 
 export function NoteCard({ note }: { note: Note }) {
   const { deleteNote } = useNoteStore();
   const { toast } = useToast();
 
-  const handleDelete = () => {
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
     deleteNote(note.id);
     toast({ title: 'Success', description: 'Note deleted.' });
   };
@@ -88,7 +90,7 @@ export function NoteCard({ note }: { note: Note }) {
         <h3 className="text-lg font-semibold text-white mb-2">{note.title}</h3>
         <p className="text-sm text-muted-foreground flex-grow">{excerpt}</p>
         <p className="text-xs text-muted-foreground mt-4 pt-4 border-t">
-            {note.lastModified}
+            {formatDistanceToNow(new Date(note.lastModified), { addSuffix: true })}
         </p>
         </GlassCard>
     </ViewNoteDialog>

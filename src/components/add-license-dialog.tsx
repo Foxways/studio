@@ -36,19 +36,23 @@ export function AddLicenseDialog({ children, license }: AddLicenseDialogProps) {
   const { addLicense, updateLicense } = useLicenseStore();
 
   useEffect(() => {
-    if (license) {
+    if (open && license) {
       setName(license.name);
       setProductKey(license.productKey);
       if (license.purchaseDate) {
-        setPurchaseDate(parseISO(license.purchaseDate));
+        setPurchaseDate(new Date(license.purchaseDate));
+      } else {
+        setPurchaseDate(undefined);
       }
       if (license.expiryDate) {
-        setExpiryDate(parseISO(license.expiryDate));
+        setExpiryDate(new Date(license.expiryDate));
+      } else {
+        setExpiryDate(undefined);
       }
-    } else {
+    } else if (!open) {
         resetForm();
     }
-  }, [license]);
+  }, [license, open]);
 
   const resetForm = () => {
     setName('');
@@ -70,8 +74,8 @@ export function AddLicenseDialog({ children, license }: AddLicenseDialogProps) {
     const newLicense = {
       name,
       productKey,
-      purchaseDate: format(purchaseDate, 'yyyy-MM-dd'),
-      expiryDate: format(expiryDate, 'yyyy-MM-dd'),
+      purchaseDate: purchaseDate.toISOString(),
+      expiryDate: expiryDate.toISOString(),
     };
 
     if (license) {
@@ -87,11 +91,6 @@ export function AddLicenseDialog({ children, license }: AddLicenseDialogProps) {
   };
 
   const handleOpenChange = (isOpen: boolean) => {
-    if (!isOpen) {
-      if (!license) {
-        resetForm();
-      }
-    }
     setOpen(isOpen);
   };
 

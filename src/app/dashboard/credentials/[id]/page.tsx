@@ -24,6 +24,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { AddCredentialDialog } from '@/components/add-credential-dialog';
+import { formatDistanceToNow } from 'date-fns';
 
 export default function CredentialDetailsPage({
   params,
@@ -165,7 +166,7 @@ export default function CredentialDetailsPage({
             )}
           <div>
             <p className="text-sm text-muted-foreground">
-              Last Modified: {credential.lastModified}
+              Last Modified: {formatDistanceToNow(new Date(credential.lastModified), { addSuffix: true })}
             </p>
           </div>
         </div>

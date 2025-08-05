@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { MoreHorizontal, Share2, Trash2 } from 'lucide-react';
-import Link from 'next/link';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,6 +37,7 @@ import { AddCredentialDialog } from '@/components/add-credential-dialog';
 import { useRouter } from 'next/navigation';
 import { useCredentialStore } from '@/stores/credential-store';
 import { useToast } from '@/hooks/use-toast';
+import { formatDistanceToNow } from 'date-fns';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -50,8 +50,8 @@ export default function Dashboard() {
     router.push(`/dashboard/credentials/${credId}`);
   };
 
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
+  const handleSelectAll = (checked: boolean | 'indeterminate') => {
+    if (checked === true) {
       setSelected(credentials.map((c) => c.id));
     } else {
       setSelected([]);
@@ -71,6 +71,12 @@ export default function Dashboard() {
     toast({ title: 'Success', description: `${selected.length} credentials deleted.` });
     setSelected([]);
   };
+
+  const handleDeleteOne = (e: React.MouseEvent, credId: string) => {
+    e.stopPropagation();
+    deleteCredential(credId);
+    toast({ title: 'Success', description: 'Credential deleted.' });
+  }
 
   return (
     <>
@@ -115,8 +121,11 @@ export default function Dashboard() {
               <TableHead className="w-[40px]">
                 <Checkbox
                   checked={
-                    credentials.length > 0 &&
-                    selected.length === credentials.length
+                    credentials.length > 0 && selected.length === credentials.length
+                      ? true
+                      : selected.length > 0
+                      ? 'indeterminate'
+                      : false
                   }
                   onCheckedChange={handleSelectAll}
                 />
@@ -162,7 +171,7 @@ export default function Dashboard() {
                   </div>
                 </TableCell>
                 <TableCell className="text-muted-foreground">
-                  {cred.lastModified}
+                  {formatDistanceToNow(new Date(cred.lastModified), { addSuffix: true })}
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
                   <DropdownMenu>
@@ -190,7 +199,7 @@ export default function Dashboard() {
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => deleteCredential(cred.id)}>
+                            <AlertDialogAction onClick={(e) => handleDeleteOne(e, cred.id)}>
                               Continue
                             </AlertDialogAction>
                           </AlertDialogFooter>
