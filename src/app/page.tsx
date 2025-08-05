@@ -4,11 +4,10 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import React, { useState } from "react"
-import { Fingerprint, Mail, Lock } from "lucide-react"
+import { Mail, Lock } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { AuthLayout } from "@/components/auth-layout"
 import { GlassCard } from "@/components/glass-card"
 import { useToast } from "@/hooks/use-toast"
@@ -56,39 +55,6 @@ export default function LoginPage() {
     }
   }
 
-  const handleBiometricLogin = async () => {
-    toast({
-        title: 'Authenticating...',
-        description: 'Please use your device\'s biometric sensor.'
-    });
-
-    // Simulate a delay for the biometric scan
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    // For this simulation, we'll try to log in a default user.
-    // In a real application, this would involve the WebAuthn API and a backend.
-    const biometricUser = users.find(u => u.email === 'user@example.com');
-
-    if (biometricUser && biometricUser.active) {
-        login(biometricUser.email);
-        toast({
-            title: 'Login Successful',
-            description: `Welcome back, ${biometricUser.name}!`
-        });
-        if (biometricUser.password === 'password123') {
-            router.push("/force-reset-password");
-        } else {
-            router.push("/dashboard");
-        }
-    } else {
-        toast({
-            variant: "destructive",
-            title: "Authentication Failed",
-            description: "Biometric login is not set up for this device or user.",
-        })
-    }
-  }
-
   return (
     <AuthLayout>
       <GlassCard className="w-full max-w-md">
@@ -125,20 +91,6 @@ export default function LoginPage() {
           </div>
           <Button type="submit" className="w-full font-semibold">
             Login
-          </Button>
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">
-                Or continue with
-              </span>
-            </div>
-          </div>
-          <Button variant="secondary" className="w-full font-semibold" type="button" onClick={handleBiometricLogin}>
-            <Fingerprint className="mr-2 h-5 w-5" />
-            Login with Biometrics
           </Button>
           <div className="mt-6 text-center text-sm">
             <p className="text-muted-foreground">
