@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import React, { useState } from "react"
 import { Fingerprint, Mail, Lock } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -9,14 +10,31 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { AuthLayout } from "@/components/auth-layout"
 import { GlassCard } from "@/components/glass-card"
+import { useToast } from "@/hooks/use-toast"
+import { users } from "@/lib/data"
 
 export default function LoginPage() {
   const router = useRouter()
+  const { toast } = useToast()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
-    // In a real app, you'd handle authentication here
-    router.push("/dashboard")
+    
+    const user = users.find(
+      (u) => u.email === email && u.password === password
+    )
+
+    if (user) {
+      router.push("/dashboard")
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: "Invalid email or password. Please try again.",
+      })
+    }
   }
 
   return (
@@ -36,6 +54,8 @@ export default function LoginPage() {
                 placeholder="email@example.com"
                 required
                 className="pl-10"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div className="relative">
@@ -46,6 +66,8 @@ export default function LoginPage() {
                 placeholder="Password"
                 required
                 className="pl-10"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
           </div>

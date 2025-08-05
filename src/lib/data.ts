@@ -1,5 +1,16 @@
 import type { ChartConfig } from "@/components/ui/chart"
 
+export const users = [
+    {
+        email: "user@example.com",
+        password: "password123",
+    },
+    {
+        email: "admin@example.com",
+        password: "adminpassword"
+    }
+]
+
 export const credentials = [
   {
     id: "1",
