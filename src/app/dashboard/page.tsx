@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { MoreHorizontal, Share2, Trash2 } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { MoreHorizontal, Share2, Trash2, Filter } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,6 +28,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuCheckboxItem,
+  DropdownMenuLabel,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -44,6 +47,7 @@ export default function Dashboard() {
   const { credentials, deleteCredential, deleteCredentials } =
     useCredentialStore();
   const [selected, setSelected] = useState<string[]>([]);
+  const [tagFilter, setTagFilter] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleRowClick = (credId: string) => {
@@ -52,7 +56,7 @@ export default function Dashboard() {
 
   const handleSelectAll = (checked: boolean | 'indeterminate') => {
     if (checked === true) {
-      setSelected(credentials.map((c) => c.id));
+      setSelected(filteredCredentials.map((c) => c.id));
     } else {
       setSelected([]);
     }
@@ -77,6 +81,21 @@ export default function Dashboard() {
     deleteCredential(credId);
     toast({ title: 'Success', description: 'Credential deleted.' });
   }
+  
+  const allTags = useMemo(() => {
+    const tags = new Set<string>();
+    credentials.forEach(cred => {
+      cred.tags.forEach(tag => tags.add(tag));
+    });
+    return Array.from(tags);
+  }, [credentials]);
+
+  const filteredCredentials = useMemo(() => {
+    if (!tagFilter) {
+      return credentials;
+    }
+    return credentials.filter(cred => cred.tags.includes(tagFilter));
+  }, [credentials, tagFilter]);
 
   return (
     <>
@@ -85,6 +104,35 @@ export default function Dashboard() {
         description="Securely manage your passwords and sensitive information."
       >
         <div className="flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                <Filter className="mr-2 h-4 w-4" /> 
+                {tagFilter ? `Filter: ${tagFilter}` : 'Filter by tag'}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>Filter by Tag</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {allTags.map(tag => (
+                <DropdownMenuCheckboxItem
+                  key={tag}
+                  checked={tagFilter === tag}
+                  onSelect={() => setTagFilter(tag === tagFilter ? null : tag)}
+                >
+                  {tag}
+                </DropdownMenuCheckboxItem>
+              ))}
+              {tagFilter && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setTagFilter(null)}>
+                    Clear filter
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button variant="outline" disabled={selected.length === 0}>
             <Share2 className="mr-2 h-4 w-4" /> Share Marked
           </Button>
@@ -121,9 +169,9 @@ export default function Dashboard() {
               <TableHead className="w-[40px]">
                 <Checkbox
                   checked={
-                    credentials.length > 0 && selected.length === credentials.length
+                    filteredCredentials.length > 0 && selected.length === filteredCredentials.length
                       ? true
-                      : selected.length > 0
+                      : selected.length > 0 && selected.length < filteredCredentials.length
                       ? 'indeterminate'
                       : false
                   }
@@ -140,7 +188,7 @@ export default function Dashboard() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {credentials.map((cred) => (
+            {filteredCredentials.map((cred) => (
               <TableRow
                 key={cred.id}
                 className="cursor-pointer"
@@ -212,6 +260,11 @@ export default function Dashboard() {
             ))}
           </TableBody>
         </Table>
+        {filteredCredentials.length === 0 && (
+            <div className="text-center text-muted-foreground p-8">
+            <p>No credentials found for the selected filter.</p>
+            </div>
+        )}
       </GlassCard>
     </>
   );
