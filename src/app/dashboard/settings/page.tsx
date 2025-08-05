@@ -1,4 +1,5 @@
-import { Sun, Moon, Download, Upload } from "lucide-react"
+import { Sun, Moon, Download, Upload, User } from "lucide-react"
+import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
 import { PageHeader } from "@/components/page-header"
@@ -12,6 +13,22 @@ export default function SettingsPage() {
         description="Customize the app's appearance and manage your data."
       />
       <div className="grid gap-8 max-w-2xl">
+         <GlassCard>
+            <h3 className="text-lg font-medium text-white mb-4">Account</h3>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h4 className="font-medium text-white">Profile</h4>
+                    <p className="text-sm text-muted-foreground">View and edit your personal information.</p>
+                </div>
+                 <Button variant="secondary" asChild>
+                    <Link href="/dashboard/profile">
+                        <User className="mr-2 h-4 w-4" />
+                        Go to Profile
+                    </Link>
+                </Button>
+            </div>
+        </GlassCard>
+
         <GlassCard>
             <h3 className="text-lg font-medium text-white mb-4">Appearance</h3>
             <div className="flex items-center justify-between">

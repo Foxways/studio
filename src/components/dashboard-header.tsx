@@ -78,14 +78,16 @@ export default function DashboardHeader() {
             <DropdownMenuLabel>{user?.email || 'My Account'}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
+              <Link href="/dashboard/profile">
+                <User className="mr-2 h-4 w-4" />
+                Profile
+              </Link>
+            </DropdownMenuItem>
+             <DropdownMenuItem asChild>
               <Link href="/dashboard/settings">
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
               </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" />
-              Profile
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
