@@ -9,11 +9,16 @@ export function AuthLayout({ children }: PropsWithChildren) {
         style={{ backgroundImage: "url('/background-gradient.svg')" }}
       ></div>
       <div className="relative z-10 flex min-h-screen flex-col items-center justify-center p-4">
-        <div className="mb-8 flex items-center gap-3 text-center">
-          <ShieldCheck className="h-10 w-10 text-primary" />
-          <h1 className="text-4xl font-bold text-white">SecurePass</h1>
+        <div className="flex-grow flex flex-col items-center justify-center w-full">
+            <div className="mb-8 flex items-center gap-3 text-center">
+            <ShieldCheck className="h-10 w-10 text-primary" />
+            <h1 className="text-4xl font-bold text-white">SecurePass</h1>
+            </div>
+            {children}
         </div>
-        {children}
+        <footer className="w-full text-center p-4 text-muted-foreground text-sm">
+            Powered by kishanmanohar@gmail.com
+        </footer>
       </div>
     </main>
   )

@@ -18,11 +18,14 @@ export default function DashboardLayout({
       <div className="relative z-10">
         <SidebarProvider defaultOpen>
             <DashboardSidebar />
-            <main className="flex flex-1 flex-col transition-[margin-left] duration-300 ease-in-out md:ml-64">
+            <main className="flex flex-1 flex-col transition-[margin-left] duration-300 ease-in-out md:ml-64 min-h-screen">
               <DashboardHeader />
               <div className="flex-1 overflow-y-auto p-4 md:p-8">
                 {children}
               </div>
+               <footer className="text-center p-4 text-muted-foreground text-sm">
+                Powered by kishanmanohar@gmail.com
+              </footer>
             </main>
         </SidebarProvider>
       </div>
