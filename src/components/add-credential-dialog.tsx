@@ -134,7 +134,7 @@ export function AddCredentialDialog() {
           <PlusCircle className="mr-2 h-4 w-4" /> Add New
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Add New Credential</DialogTitle>
           <DialogDescription>
