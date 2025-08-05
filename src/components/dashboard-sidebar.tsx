@@ -39,7 +39,7 @@ const bottomNavLinks = [
 export default function DashboardSidebar({ isMobile = false }) {
   const pathname = usePathname()
 
-  const NavLink = ({ href, label, icon: Icon }: (typeof mainNavLinks)[0]) => (
+  const NavLink = ({ href, label, icon: Icon }: (typeof mainNavLinks)[0] | (typeof toolLinks)[0]) => (
     <Link
       href={href}
       className={cn(
@@ -61,31 +61,33 @@ export default function DashboardSidebar({ isMobile = false }) {
           </Link>
         </div>
         <ScrollArea className="flex-1">
-          <nav className="grid items-start gap-1 px-2 text-sm font-medium lg:px-4">
-            {mainNavLinks.map((link) => (
-              <NavLink key={link.href} {...link} />
-            ))}
-            <Accordion type="single" collapsible defaultValue="tools" className="w-full">
-              <AccordionItem value="tools" className="border-none">
-                <AccordionTrigger className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:no-underline [&[data-state=open]>svg]:rotate-180">
-                   <Wrench className="h-4 w-4" />
-                   Tools
-                </AccordionTrigger>
-                <AccordionContent className="pl-8">
-                  <nav className="grid gap-1">
-                    {toolLinks.map((link) => (
-                      <NavLink key={link.href} {...link} />
-                    ))}
-                  </nav>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          </nav>
-          <nav className="mt-auto grid items-start gap-1 px-2 text-sm font-medium lg:px-4">
-            {bottomNavLinks.map((link) => (
-              <NavLink key={link.href} {...link} />
-            ))}
-          </nav>
+          <div className="flex flex-col h-full justify-between">
+            <nav className="grid items-start gap-1 px-2 text-sm font-medium lg:px-4">
+              {mainNavLinks.map((link) => (
+                <NavLink key={link.href} {...link} />
+              ))}
+              <Accordion type="single" collapsible defaultValue="tools" className="w-full">
+                <AccordionItem value="tools" className="border-none">
+                  <AccordionTrigger className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:no-underline [&[data-state=open]>svg]:rotate-180">
+                     <Wrench className="h-4 w-4" />
+                     Tools
+                  </AccordionTrigger>
+                  <AccordionContent className="pl-8">
+                    <nav className="grid gap-1">
+                      {toolLinks.map((link) => (
+                        <NavLink key={link.href} {...link} />
+                      ))}
+                    </nav>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </nav>
+            <nav className="mt-auto grid items-start gap-1 px-2 text-sm font-medium lg:px-4">
+              {bottomNavLinks.map((link) => (
+                <NavLink key={link.href} {...link} />
+              ))}
+            </nav>
+          </div>
         </ScrollArea>
       </div>
     );

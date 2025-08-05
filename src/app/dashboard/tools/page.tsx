@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bot, HeartPulse, ScanSearch, ShieldAlert } from "lucide-react";
+import { Bot } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { GlassCard } from "@/components/glass-card";
 
