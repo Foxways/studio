@@ -48,8 +48,8 @@ export function AddLicenseDialog({ children, license }: AddLicenseDialogProps) {
       setProductKey(license.productKey);
       setPurchaseDate(new Date(license.purchaseDate));
       setExpiryDate(new Date(license.expiryDate));
-    } else {
-        // When opening for a new license, or when dialog closes, reset.
+    } else if (!open) {
+        // When dialog closes, reset.
         resetForm();
     }
   }, [license, open]);
