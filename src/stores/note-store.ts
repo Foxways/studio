@@ -15,6 +15,7 @@ type NoteState = {
   updateNote: (id: string, updatedNote: Omit<Note, 'id' | 'lastModified'>) => void;
   deleteNote: (id: string) => void;
   findNote: (id: string) => Note | undefined;
+  replaceNotes: (notes: Note[]) => void;
 };
 
 export const useNoteStore = create<NoteState>((set, get) => ({
@@ -44,4 +45,5 @@ export const useNoteStore = create<NoteState>((set, get) => ({
       notes: state.notes.filter((n) => n.id !== id),
     })),
   findNote: (id) => get().notes.find((n) => n.id === id),
+  replaceNotes: (notes) => set({ notes }),
 }));

@@ -15,6 +15,7 @@ type LicenseState = {
   updateLicense: (id: string, updatedLicense: Omit<License, 'id'>) => void;
   deleteLicense: (id: string) => void;
   findLicense: (id: string) => License | undefined;
+  replaceLicenses: (licenses: License[]) => void;
 };
 
 export const useLicenseStore = create<LicenseState>((set, get) => ({
@@ -43,4 +44,5 @@ export const useLicenseStore = create<LicenseState>((set, get) => ({
       licenses: state.licenses.filter((l) => l.id !== id),
     })),
   findLicense: (id) => get().licenses.find((l) => l.id === id),
+  replaceLicenses: (licenses) => set({ licenses }),
 }));

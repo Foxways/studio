@@ -20,6 +20,7 @@ type CredentialState = {
   deleteCredential: (id: string) => void;
   deleteCredentials: (ids: string[]) => void;
   findCredential: (id: string) => Credential | undefined;
+  replaceCredentials: (credentials: Credential[]) => void;
 };
 
 export const useCredentialStore = create<CredentialState>((set, get) => ({
@@ -47,4 +48,5 @@ export const useCredentialStore = create<CredentialState>((set, get) => ({
       credentials: state.credentials.filter((c) => !ids.includes(c.id)),
     })),
   findCredential: (id) => get().credentials.find((c) => c.id === id),
+  replaceCredentials: (credentials) => set({ credentials }),
 }));
