@@ -7,26 +7,8 @@ const tools = [
   {
     href: "/dashboard/tools/password-generator",
     label: "Password Generator",
-    description: "Create strong, complex passwords with AI.",
+    description: "Create strong, complex passwords.",
     icon: Bot,
-  },
-  {
-    href: "/dashboard/tools/password-analyzer",
-    label: "Password Analyzer",
-    description: "Analyze strength and check for compromises.",
-    icon: HeartPulse,
-  },
-  {
-    href: "/dashboard/tools/phishing-detector",
-    label: "Phishing Detector",
-    description: "Scan URLs for potential phishing threats.",
-    icon: ScanSearch,
-  },
-  {
-    href: "/dashboard/tools/dark-web-monitor",
-    label: "Dark Web Monitor",
-    description: "Check if your credentials are on the dark web.",
-    icon: ShieldAlert,
   },
 ];
 
@@ -35,7 +17,7 @@ export default function ToolsPage() {
     <>
       <PageHeader
         title="Security Tools"
-        description="Leverage AI-powered tools to enhance your security."
+        description="Leverage tools to enhance your security."
       />
       <div className="grid gap-4 md:grid-cols-2">
         {tools.map((tool) => (

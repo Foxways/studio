@@ -23,7 +23,6 @@ import {
 } from '@/components/ui/select';
 import { Badge } from './ui/badge';
 import { Textarea } from './ui/textarea';
-import { generatePasswordAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { useCredentialStore, type Credential } from '@/stores/credential-store';
 import { formatDistanceToNow } from 'date-fns';
@@ -98,27 +97,30 @@ export function AddCredentialDialog({ children, credential }: AddCredentialDialo
   const handleTagRemove = (tag: string) => {
     setTags(tags.filter((t) => t !== tag));
   };
+  
+  const generatePassword = () => {
+    const charSets = {
+        lowercase: 'abcdefghijklmnopqrstuvwxyz',
+        uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+        numbers: '0123456789',
+        symbols: '!@#$%^&*()_+-=[]{}|;:,.<>?'
+    };
+    const availableChars = charSets.lowercase + charSets.uppercase + charSets.numbers + charSets.symbols;
+    let newPassword = '';
+    for (let i = 0; i < 16; i++) {
+        const randomIndex = Math.floor(Math.random() * availableChars.length);
+        newPassword += availableChars[randomIndex];
+    }
+    return newPassword;
+  }
 
   const handleGeneratePassword = async () => {
     setIsGenerating(true);
-    const response = await generatePasswordAction({
-      length: 16,
-      useUppercase: true,
-      useLowercase: true,
-      useNumbers: true,
-      useSymbols: true,
-      complexityLevel: 'high',
-    });
-    if (response.success && response.data) {
-      setPassword(response.data.password);
-      toast({ title: 'Success', description: 'New password generated.' });
-    } else {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Could not generate password.',
-      });
-    }
+    // Simulate a short delay for better UX
+    await new Promise(resolve => setTimeout(resolve, 300));
+    const newPassword = generatePassword();
+    setPassword(newPassword);
+    toast({ title: 'Success', description: 'New password generated.' });
     setIsGenerating(false);
   };
 

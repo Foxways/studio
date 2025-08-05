@@ -10,15 +10,9 @@ import {
   Wrench,
   Settings,
   UserCog,
-  HeartPulse,
-  ScanSearch,
   Bot,
-  ShieldAlert,
-  BadgeInfo,
-  ChevronDown
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Button } from "./ui/button"
 import {
   Accordion,
   AccordionContent,
@@ -35,9 +29,6 @@ const mainNavLinks = [
 
 const toolLinks = [
   { href: "/dashboard/tools/password-generator", label: "Password Generator", icon: Bot },
-  { href: "/dashboard/tools/password-analyzer", label: "Password Analyzer", icon: HeartPulse },
-  { href: "/dashboard/tools/phishing-detector", label: "Phishing Detector", icon: ScanSearch },
-  { href: "/dashboard/tools/dark-web-monitor", label: "Dark Web Monitor", icon: ShieldAlert },
 ]
 
 const bottomNavLinks = [
