@@ -17,9 +17,20 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import DashboardSidebar from '@/components/dashboard-sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useSearchStore } from '@/stores/search-store';
+import { useAuthStore } from '@/stores/auth-store';
+import { useRouter } from 'next/navigation';
 
 export default function DashboardHeader() {
   const { searchQuery, setSearchQuery } = useSearchStore();
+  const { user, logout } = useAuthStore();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout();
+    router.push('/');
+  }
+
+  const userInitial = user?.email ? user.email.charAt(0).toUpperCase() : 'U';
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background/50 px-4 backdrop-blur-md md:px-6">
@@ -55,16 +66,16 @@ export default function DashboardHeader() {
             <Button variant="secondary" size="icon" className="rounded-full">
               <Avatar>
                 <AvatarImage
-                  src="https://placehold.co/40x40.png"
+                  src={`https://placehold.co/40x40.png?text=${userInitial}`}
                   data-ai-hint="user avatar"
                 />
-                <AvatarFallback>U</AvatarFallback>
+                <AvatarFallback>{userInitial}</AvatarFallback>
               </Avatar>
               <span className="sr-only">Toggle user menu</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>{user?.email || 'My Account'}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <Link href="/dashboard/settings">
@@ -77,11 +88,9 @@ export default function DashboardHeader() {
               Profile
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link href="/">
+            <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 Logout
-              </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -12,10 +12,12 @@ import { AuthLayout } from "@/components/auth-layout"
 import { GlassCard } from "@/components/glass-card"
 import { useToast } from "@/hooks/use-toast"
 import { users } from "@/lib/data"
+import { useAuthStore } from "@/stores/auth-store"
 
 export default function LoginPage() {
   const router = useRouter()
   const { toast } = useToast()
+  const { login } = useAuthStore();
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
@@ -27,6 +29,7 @@ export default function LoginPage() {
     )
 
     if (user) {
+      login(user.email);
       router.push("/dashboard")
     } else {
       toast({
