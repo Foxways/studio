@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from "next/link"
@@ -23,12 +24,13 @@ import {
 } from "@/components/ui/accordion"
 import { ScrollArea } from "./ui/scroll-area"
 import { useAuthStore } from "@/stores/auth-store"
+import { useShareStore } from "@/stores/share-store"
 
 const mainNavLinks = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/dashboard/notes", label: "Notes", icon: StickyNote },
   { href: "/dashboard/licenses", label: "Licenses", icon: KeyRound },
-  { href: "/dashboard/inbox", label: "Inbox", icon: Inbox },
+  { href: "/dashboard/inbox", label: "Inbox", icon: Inbox, isInbox: true },
   { href: "/dashboard/outbox", label: "Outbox", icon: Send },
 ]
 
@@ -46,8 +48,11 @@ const adminLink = { href: "/dashboard/admin", label: "Admin", icon: UserCog };
 export default function DashboardSidebar({ isMobile = false }) {
   const pathname = usePathname()
   const { user } = useAuthStore();
+  const { getInbox } = useShareStore();
 
-  const NavLink = ({ href, label, icon: Icon }: (typeof mainNavLinks)[0] | (typeof toolLinks)[0]) => (
+  const inboxCount = user ? getInbox(user.email).length : 0;
+
+  const NavLink = ({ href, label, icon: Icon, isInbox = false }: (typeof mainNavLinks)[0]) => (
     <Link
       href={href}
       className={cn(
@@ -57,6 +62,11 @@ export default function DashboardSidebar({ isMobile = false }) {
     >
       <Icon className="h-4 w-4" />
       {label}
+      {isInbox && inboxCount > 0 && (
+        <span className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-medium">
+          {inboxCount}
+        </span>
+      )}
     </Link>
   )
   

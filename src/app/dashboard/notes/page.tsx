@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -7,6 +8,7 @@ import { PageHeader } from "@/components/page-header"
 import { AddNoteDialog } from "@/components/add-note-dialog";
 import { NoteCard } from "@/components/note-card";
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 export default function NotesPage() {
   const { notes } = useNoteStore();
@@ -17,7 +19,9 @@ export default function NotesPage() {
       return notes;
     }
     return notes.filter((note) =>
-      note.title.toLowerCase().includes(searchQuery.toLowerCase())
+      note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      note.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      note.content.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [notes, searchQuery]);
 
@@ -27,21 +31,21 @@ export default function NotesPage() {
         title="Secure Notes"
         description="Organize your thoughts and sensitive information securely."
       >
-        <div className="flex items-center gap-2">
-            <div className="relative">
+        <div className="flex w-full md:w-auto flex-col md:flex-row items-stretch md:items-center gap-2">
+            <div className="relative flex-1 md:flex-initial">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                     type="search"
                     placeholder="Search notes..."
-                    className="pl-10"
+                    className="pl-10 w-full"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
             </div>
             <AddNoteDialog>
-                <button className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+                <Button>
                     <PlusCircle className="mr-2 h-4 w-4" /> Add Note
-                </button>
+                </Button>
             </AddNoteDialog>
         </div>
       </PageHeader>
@@ -52,8 +56,10 @@ export default function NotesPage() {
         ))}
       </div>
       {filteredNotes.length === 0 && (
-        <div className="text-center text-muted-foreground py-16">
-          <p>No notes found matching your search.</p>
+        <div className="text-center text-muted-foreground py-16 col-span-full">
+            <Search className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
+            <h3 className="text-xl font-semibold text-white">No Notes Found</h3>
+          <p>You haven't created any notes yet, or your search returned no results.</p>
         </div>
       )}
     </>

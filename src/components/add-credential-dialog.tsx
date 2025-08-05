@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -197,8 +198,8 @@ export function AddCredentialDialog({ children, credential }: AddCredentialDialo
             <div className="flex gap-2">
               <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
               <Button variant="secondary" onClick={handleGeneratePassword} disabled={isGenerating}>
-                {isGenerating ? <RefreshCw className="animate-spin" /> : <Sparkles />}
-                Generate
+                {isGenerating ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                <span className='hidden sm:inline'>Generate</span>
               </Button>
             </div>
           </div>

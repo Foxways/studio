@@ -1,7 +1,7 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -34,8 +34,14 @@ const passwordFormSchema = z
 
 export default function ProfilePage() {
   const { user, changePassword } = useAuthStore()
-  const [name, setName] = useState('User');
+  const [name, setName] = useState('');
   const { toast } = useToast()
+
+  useEffect(() => {
+    if (user) {
+      setName(user.email.split('@')[0]);
+    }
+  }, [user]);
 
   const passwordForm = useForm<z.infer<typeof passwordFormSchema>>({
     resolver: zodResolver(passwordFormSchema),
@@ -82,7 +88,7 @@ export default function ProfilePage() {
         title="Profile"
         description="Manage your personal details and account settings."
       />
-      <div className="grid gap-8 max-w-2xl">
+      <div className="grid gap-8 max-w-2xl mx-auto">
         <GlassCard>
           <h3 className="text-lg font-medium text-white mb-6">Personal Details</h3>
           <div className="space-y-4">
