@@ -58,14 +58,27 @@ export function ShareDialog({ children, itemIds, itemType, disabled = false }: S
   }
 
   const handleShare = () => {
-    if (recipients.length === 0) {
+    if (recipients.length === 0 && !currentEmail) {
       toast({ variant: 'destructive', title: 'Error', description: 'Please enter at least one recipient email address.' });
       return;
     }
 
-    let totalSharedCount = 0;
+    const allRecipients = [...recipients];
+    if (currentEmail.trim()) {
+        const finalEmail = currentEmail.trim().toLowerCase();
+        if(!allRecipients.includes(finalEmail)) {
+            allRecipients.push(finalEmail);
+        }
+    }
 
-    recipients.forEach(email => {
+    if (allRecipients.length === 0) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Please enter at least one recipient email address.' });
+      return;
+    }
+
+    let itemsShared = false;
+
+    allRecipients.forEach(email => {
         const recipient = users.find((u) => u.email === email);
         if (!recipient) {
           toast({ variant: 'destructive', title: 'User not found', description: `User with email ${email} does not exist.` });
@@ -76,27 +89,25 @@ export function ShareDialog({ children, itemIds, itemType, disabled = false }: S
           return;
         }
 
-        let sharedCount = 0;
         itemIds.forEach((id) => {
-        const itemData = itemType === 'credential' ? findCredential(id) : findNote(id);
-        if (itemData && currentUser) {
-            shareItem(currentUser.email, recipient.email, itemData);
-            sharedCount++;
-        }
+            const itemData = itemType === 'credential' ? findCredential(id) : findNote(id);
+            if (itemData && currentUser) {
+                shareItem(currentUser.email, recipient.email, itemData);
+                itemsShared = true;
+            }
         });
 
-        if (sharedCount > 0) {
-            totalSharedCount += sharedCount
-            toast({
+         if (itemIds.length > 0) {
+             toast({
                 title: 'Success',
                 description: `${itemIds.length} item(s) shared successfully with ${email}.`,
             });
-        }
+         }
     });
 
 
-    if(totalSharedCount > 0) {
-        setOpen(false);
+    if(itemsShared) {
+        handleOpenChange(false);
     }
   };
 
