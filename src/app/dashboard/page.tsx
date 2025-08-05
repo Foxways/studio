@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { MoreHorizontal, Share2, Trash2, Filter } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
+import { MoreHorizontal, Share2, Trash2, Filter, Search } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,6 +39,7 @@ import { GlassCard } from '@/components/glass-card';
 import { AddCredentialDialog } from '@/components/add-credential-dialog';
 import { useRouter } from 'next/navigation';
 import { useCredentialStore } from '@/stores/credential-store';
+import { useSearchStore } from '@/stores/search-store';
 import { useToast } from '@/hooks/use-toast';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -46,9 +47,17 @@ export default function Dashboard() {
   const router = useRouter();
   const { credentials, deleteCredential, deleteCredentials } =
     useCredentialStore();
+  const { searchQuery, setSearchQuery } = useSearchStore();
   const [selected, setSelected] = useState<string[]>([]);
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const { toast } = useToast();
+  
+  // Clear search query on component unmount
+  useEffect(() => {
+    return () => {
+      setSearchQuery('');
+    };
+  }, [setSearchQuery]);
 
   const handleRowClick = (credId: string) => {
     router.push(`/dashboard/credentials/${credId}`);
@@ -69,10 +78,13 @@ export default function Dashboard() {
       setSelected(selected.filter((sId) => sId !== id));
     }
   };
-  
+
   const handleDeleteMarked = () => {
     deleteCredentials(selected);
-    toast({ title: 'Success', description: `${selected.length} credentials deleted.` });
+    toast({
+      title: 'Success',
+      description: `${selected.length} credentials deleted.`,
+    });
     setSelected([]);
   };
 
@@ -80,22 +92,39 @@ export default function Dashboard() {
     e.stopPropagation();
     deleteCredential(credId);
     toast({ title: 'Success', description: 'Credential deleted.' });
-  }
-  
+  };
+
   const allTags = useMemo(() => {
     const tags = new Set<string>();
-    credentials.forEach(cred => {
-      cred.tags.forEach(tag => tags.add(tag));
+    credentials.forEach((cred) => {
+      cred.tags.forEach((tag) => tags.add(tag));
     });
     return Array.from(tags);
   }, [credentials]);
 
   const filteredCredentials = useMemo(() => {
-    if (!tagFilter) {
-      return credentials;
+    let creds = credentials;
+
+    // Filter by tag
+    if (tagFilter) {
+      creds = creds.filter((cred) => cred.tags.includes(tagFilter));
     }
-    return credentials.filter(cred => cred.tags.includes(tagFilter));
-  }, [credentials, tagFilter]);
+
+    // Filter by search query
+    if (searchQuery) {
+      const lowercasedQuery = searchQuery.toLowerCase();
+      creds = creds.filter(
+        (cred) =>
+          cred.title.toLowerCase().includes(lowercasedQuery) ||
+          cred.username.toLowerCase().includes(lowercasedQuery) ||
+          cred.url.toLowerCase().includes(lowercasedQuery) ||
+          cred.tags.some((tag) =>
+            tag.toLowerCase().includes(lowercasedQuery)
+          )
+      );
+    }
+    return creds;
+  }, [credentials, tagFilter, searchQuery]);
 
   return (
     <>
@@ -107,14 +136,14 @@ export default function Dashboard() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
-                <Filter className="mr-2 h-4 w-4" /> 
+                <Filter className="mr-2 h-4 w-4" />
                 {tagFilter ? `Filter: ${tagFilter}` : 'Filter by tag'}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuLabel>Filter by Tag</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {allTags.map(tag => (
+              {allTags.map((tag) => (
                 <DropdownMenuCheckboxItem
                   key={tag}
                   checked={tagFilter === tag}
@@ -146,12 +175,15 @@ export default function Dashboard() {
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete {selected.length} selected credentials.
+                  This action cannot be undone. This will permanently delete{' '}
+                  {selected.length} selected credentials.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDeleteMarked}>Continue</AlertDialogAction>
+                <AlertDialogAction onClick={handleDeleteMarked}>
+                  Continue
+                </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
@@ -169,9 +201,11 @@ export default function Dashboard() {
               <TableHead className="w-[40px]">
                 <Checkbox
                   checked={
-                    filteredCredentials.length > 0 && selected.length === filteredCredentials.length
+                    filteredCredentials.length > 0 &&
+                    selected.length === filteredCredentials.length
                       ? true
-                      : selected.length > 0 && selected.length < filteredCredentials.length
+                      : selected.length > 0 &&
+                        selected.length < filteredCredentials.length
                       ? 'indeterminate'
                       : false
                   }
@@ -219,7 +253,9 @@ export default function Dashboard() {
                   </div>
                 </TableCell>
                 <TableCell className="text-muted-foreground">
-                  {formatDistanceToNow(new Date(cred.lastModified), { addSuffix: true })}
+                  {formatDistanceToNow(new Date(cred.lastModified), {
+                    addSuffix: true,
+                  })}
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
                   <DropdownMenu>
@@ -230,24 +266,36 @@ export default function Dashboard() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                       <AddCredentialDialog credential={cred}>
-                         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>Edit</DropdownMenuItem>
-                       </AddCredentialDialog>
+                      <AddCredentialDialog credential={cred}>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                          Edit
+                        </DropdownMenuItem>
+                      </AddCredentialDialog>
                       <DropdownMenuItem>Share</DropdownMenuItem>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                           <DropdownMenuItem className="text-red-500" onSelect={(e) => e.preventDefault()}>Delete</DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-red-500"
+                            onSelect={(e) => e.preventDefault()}
+                          >
+                            Delete
+                          </DropdownMenuItem>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogTitle>
+                              Are you absolutely sure?
+                            </AlertDialogTitle>
                             <AlertDialogDescription>
-                              This action cannot be undone. This will permanently delete this credential.
+                              This action cannot be undone. This will
+                              permanently delete this credential.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={(e) => handleDeleteOne(e, cred.id)}>
+                            <AlertDialogAction
+                              onClick={(e) => handleDeleteOne(e, cred.id)}
+                            >
                               Continue
                             </AlertDialogAction>
                           </AlertDialogFooter>
@@ -261,9 +309,12 @@ export default function Dashboard() {
           </TableBody>
         </Table>
         {filteredCredentials.length === 0 && (
-            <div className="text-center text-muted-foreground p-8">
-            <p>No credentials found for the selected filter.</p>
-            </div>
+          <div className="text-center text-muted-foreground p-8">
+            <Search className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
+            <h3 className="text-xl font-semibold text-white">No results found</h3>
+            <p>Your search for "{searchQuery}" did not match any credentials.</p>
+            <p className="text-sm mt-1">Try searching for something else or clear the filters.</p>
+          </div>
         )}
       </GlassCard>
     </>
