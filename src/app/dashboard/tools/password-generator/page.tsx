@@ -73,6 +73,7 @@ export default function PasswordGeneratorPage() {
     if (result?.password) {
       navigator.clipboard.writeText(result.password)
       setCopied(true)
+      toast({ title: 'Copied!', description: 'Password copied to clipboard.'})
       setTimeout(() => setCopied(false), 2000)
     }
   }
@@ -185,8 +186,9 @@ export default function PasswordGeneratorPage() {
                         <p className="text-lg font-mono p-4 pr-12 bg-black/20 rounded-md break-all text-white">
                             {result.password}
                         </p>
-                        <Button variant="ghost" size="icon" className="absolute top-2 right-2" onClick={handleCopy}>
+                        <Button variant="ghost" size="icon" className="absolute top-1/2 right-2 -translate-y-1/2 h-8 w-8" onClick={handleCopy}>
                             {copied ? <Check className="h-5 w-5 text-green-400" /> : <Clipboard className="h-5 w-5" />}
+                            <span className="sr-only">Copy password</span>
                         </Button>
                     </div>
                      <div className="p-4 bg-black/20 rounded-md">

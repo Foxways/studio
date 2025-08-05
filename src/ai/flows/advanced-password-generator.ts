@@ -36,7 +36,20 @@ const prompt = ai.definePrompt({
   name: 'generateAdvancedPasswordPrompt',
   input: {schema: GenerateAdvancedPasswordInputSchema},
   output: {schema: GenerateAdvancedPasswordOutputSchema},
-  prompt: `You are a password generation expert. Generate a strong and secure password based on the following criteria:\n\nDesired Length: {{{length}}} characters\nUse Uppercase: {{#if useUppercase}}Yes{{else}}No{{/if}}\nUse Lowercase: {{#if useLowercase}}Yes{{else}}No{{/if}}\nUse Numbers: {{#if useNumbers}}Yes{{else}}No{{/if}}\nUse Symbols: {{#if useSymbols}}Yes{{else}}No{{/if}}\nComplexity Level: {{{complexityLevel}}}\nAdditional Criteria: {{{additionalCriteria}}}\n\nExplain why the generated password is considered strong and secure, considering the provided criteria. Make sure to include what character types it contains and the overall randomness of the password. Do not include the generated password in your explanation.\n\nPassword:`, // The AI will append the password to this prompt; this is intentional.
+  prompt: `You are a password generation expert. Generate a strong and secure password based on the following criteria:
+
+Desired Length: {{{length}}} characters
+Use Uppercase: {{#if useUppercase}}Yes{{else}}No{{/if}}
+Use Lowercase: {{#if useLowercase}}Yes{{else}}No{{/if}}
+Use Numbers: {{#if useNumbers}}Yes{{else}}No{{/if}}
+Use Symbols: {{#if useSymbols}}Yes{{else}}No{{/if}}
+Complexity Level: {{{complexityLevel}}}
+{{#if additionalCriteria}}Additional Criteria: {{{additionalCriteria}}}{{/if}}
+
+First, generate the password.
+Then, on a new line, explain why the generated password is strong.
+Make sure to include what character types it contains and the overall randomness of the password.
+Do not include the generated password in your explanation.`,
   config: {
     safetySettings: [
       {
@@ -55,11 +68,6 @@ const generateAdvancedPasswordFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
-    const password = output!.password;
-    const reasoning = output!.reasoning;
-    return {
-      password,
-      reasoning,
-    };
+    return output!;
   }
 );
